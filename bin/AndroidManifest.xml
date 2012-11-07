@@ -10,6 +10,7 @@
   <!--  Zugriffe -->
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>  
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>  
+  <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"></uses-permission>  
   
     <application
         android:icon="@drawable/ic_launcher"
@@ -22,8 +23,12 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+<!--                 <action android:name="neui.location" /> -->
             </intent-filter>
         </activity>
+       
+		<service android:name=".service.GpsService" android:process=":gpsService"></service>
+		<service android:name="ch.imbApp.cash_next_door.service.SensorService" android:process=":SensorService"></service>
     </application>
 
 </manifest>

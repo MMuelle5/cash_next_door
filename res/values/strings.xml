@@ -5,4 +5,7 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
 	<string name="woBinIch">Suech mich</string>
+	<string name="longitude">Längengrad: </string>
+	<string name="latitude">Breitengrad: </string>
+	<string name="distance">Distanz zum nächsten Automaten: </string>
 </resources>
