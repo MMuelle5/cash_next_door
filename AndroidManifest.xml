@@ -23,12 +23,13 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-<!--                 <action android:name="neui.location" /> -->
             </intent-filter>
         </activity>
+        
+        <activity android:name=".ViewActivity" />
        
 		<service android:name=".service.GpsService" android:process=":gpsService"></service>
-		<service android:name="ch.imbApp.cash_next_door.service.SensorService" android:process=":SensorService"></service>
+		<service android:name=".service.SensorService" android:process=":SensorService"></service>
     </application>
 
 </manifest>

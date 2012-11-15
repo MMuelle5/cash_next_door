@@ -16,8 +16,11 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.util.Log;
 
 public class GpsService extends Service implements LocationListener {
+	
+	private static final String TAG = "GpsService";
     private NotificationManager nm;
 
     ArrayList<Messenger> mClients = new ArrayList<Messenger>(); // Keeps track of all current registered clients.
@@ -27,13 +30,11 @@ public class GpsService extends Service implements LocationListener {
     final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
 
 	public final static String NEW_LOCATION ="neui.location";
+
 	private LocationManager locationManager;
 	public Location location;
 	public Double latitude = Double.valueOf(0d);
 	public Double longitude = Double.valueOf(0d);
-	public Double distance = Double.valueOf(0d);
-	
-	private Location lastPosLoaded;
 	
 	Intent intent;
 	
@@ -63,19 +64,19 @@ public class GpsService extends Service implements LocationListener {
 
 	public void onLocationChanged(Location arg0) {
         location = arg0;  
+        System.out.println(location);
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         
-//        if(lastPosLoaded == null || lastPosLoaded.distanceTo(location)>12) { //Automaten sporadisch neu laden
-//        	
-//        	lastPosLoaded = location;
-//        }
         sendMessageToUI();
 	}
 
 	public int onStartCommand(final Intent intent, final int flags, final int startId) {
+		
+		Log.i(TAG, "onCreate");
+		
 		this.intent = intent;
-	
+		
 	    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -90,7 +91,11 @@ public class GpsService extends Service implements LocationListener {
 	    Criteria criteria = new Criteria();
 	    String provider = locationManager.getBestProvider(criteria, false);
 	    Location location = locationManager.getLastKnownLocation(provider);
-		onLocationChanged(location);
+
+		if(location != null) {
+			onLocationChanged(location);
+		}
+		
 		return START_STICKY;
 
 	}
@@ -152,12 +157,7 @@ public class GpsService extends Service implements LocationListener {
                 b.putDouble("longitude", longitude);
                 msg.setData(b);
                 mClients.get(i).send(msg);
-
-                b = new Bundle();
-                b.putDouble("distance", distance);
-                msg.setData(b);
-                mClients.get(i).send(msg);
-
+                
             } catch (RemoteException e) {
             	e.printStackTrace();
                 // The client is dead. Remove it from the list; we are going through the list from back to front so this is safe to do inside the loop.
