@@ -9,7 +9,7 @@ public class CalcAngle {
 		NULL_PUNKT.setLatitude(0d);
 		NULL_PUNKT.setLongitude(0d);
 	}
-	public static int calcAngle(int myDirection, Location myLocation, Location targetLocation) {
+	public static double calcAngle(double myDirection, Location myLocation, Location targetLocation) {
 		
 		double distA = myLocation.distanceTo(targetLocation);
 		double distB = myLocation.distanceTo(NULL_PUNKT);
@@ -26,10 +26,11 @@ public class CalcAngle {
 //		}
 		alpha = Math.acos((-distA * distA + distB *distB + distC * distC) / (2.0 * distB * distC));
 		
-		int totDir = myDirection;
-		totDir = totDir < 0 ? 360 -totDir : totDir;
+		double totDir = myDirection;
+
+		totDir = totDir < 270 ? 360 -totDir : totDir;
 		
-		
-		return (int) alpha;
+//TODO richtig implementieren		
+		return alpha;
 	}
 }

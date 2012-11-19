@@ -8,6 +8,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.hardware.Camera;
+import android.hardware.Camera.CameraInfo;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -18,11 +20,13 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.TextView;
+import ch.imbApp.cash_next_door.alert.Alerts;
 import ch.imbApp.cash_next_door.bean.BankOmat;
 import ch.imbApp.cash_next_door.calc.AutomatenLoader;
 import ch.imbApp.cash_next_door.calc.CalcAngle;
 import ch.imbApp.cash_next_door.service.GpsService;
 import ch.imbApp.cash_next_door.service.SensorService;
+
 
 public class ViewActivity extends Activity {
 
@@ -34,6 +38,7 @@ public class ViewActivity extends Activity {
 	private TextView lon;
 	private TextView distance;
 	private TextView angle;
+	private TextView myDirectionText;
 
 	private Location myLoc;
 	private Location lastPosLoaded;
@@ -41,38 +46,51 @@ public class ViewActivity extends Activity {
 	
 
     Messenger mService = null;
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
+    Messenger mSensorService = null;
+    final Messenger mGpsMessenger = new Messenger(new IncomingGpsHandler());
+    final Messenger mSensorMessenger = new Messenger(new IncomingSensorHandler());
+    private double myDirection;
+    private Camera camera;
     
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
 		context = this;
+		
+		CameraView cv = new CameraView(this);
+//		setContentView(cv);
+		
+		
+		
 		setContentView(R.layout.activity_view);
 		lat = (TextView) findViewById(R.id.latitude);
 		lon = (TextView) findViewById(R.id.longitude);
 		distance = (TextView) findViewById(R.id.distance);
 		angle = (TextView) findViewById(R.id.angle);
+		myDirectionText = (TextView) findViewById(R.id.myDirection);
 
+	    Alerts.init(context);
 
+	    System.out.println("sensor start");
 		startService(new Intent(context, SensorService.class));
-		System.out.println("sensor gestartet");
 		startService(new Intent(context, GpsService.class));
 		
         doBindService();
 	}
 	
     void doBindService() {
-        bindService(new Intent(this, GpsService.class), mConnection, Context.BIND_AUTO_CREATE);
+    	bindService(new Intent(this, GpsService.class), mGpsConnection, Context.BIND_AUTO_CREATE);
+        
+        bindService(new Intent(this, SensorService.class), mSensorConnection, Context.BIND_AUTO_CREATE);
     }
     
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mGpsConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             mService = new Messenger(service);
-//            textStatus.setText("Attached.");
             try {
                 Message msg = Message.obtain(null, GpsService.MSG_REGISTER_CLIENT);
-                msg.replyTo = mMessenger;
+                msg.replyTo = mGpsMessenger;
                 mService.send(msg);
             } catch (RemoteException e) {
                 // In this case the service has crashed before we could even do anything with it
@@ -83,8 +101,25 @@ public class ViewActivity extends Activity {
 			mService = null;
 		}
     };
+    
+    private ServiceConnection mSensorConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+        	mSensorService = new Messenger(service);
+            try {
+                Message msg = Message.obtain(null, SensorService.MSG_REGISTER_CLIENT);
+                msg.replyTo = mSensorMessenger;
+                mSensorService.send(msg);
+            } catch (RemoteException e) {
+                // In this case the service has crashed before we could even do anything with it
+            }
+        }
 
-    class IncomingHandler extends Handler {
+		public void onServiceDisconnected(ComponentName name) {
+			mService = null;
+		}
+    };
+
+    class IncomingGpsHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
 
@@ -114,11 +149,38 @@ public class ViewActivity extends Activity {
             }
             for(BankOmat machine: cashMachines) {
             	distance.setText(myLoc.distanceTo(machine.getLocation())+" Meter");
-            	int myAngle = CalcAngle.calcAngle(0, myLoc, machine.getLocation());
+            	double myAngle = CalcAngle.calcAngle(myDirection, myLoc, machine.getLocation());
             	System.out.println(myAngle);
                 angle.setText(myAngle + "°");
             }
             
+        }
+    }
+
+    class IncomingSensorHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+        	
+            switch (msg.what) {
+            	case SensorService.MSG_SET_STRING_VALUE:
+            	
+            	if(msg.getData().getDouble("x") != 0d) {
+            		double x = msg.getData().getDouble("x");
+            		myDirectionText.setText(myDirection+"°");
+            		myDirection = x;
+            	}
+                break;
+                case SensorService.MSG_SET_BOOLEAN_VALUE:
+                	if(msg.getData().getBoolean(SensorService.POPUP_FIELD)) {
+	        			Alerts.showDialog(Alerts.ALERT_HORIZONTALE);
+                	}
+                	else {
+	        			Alerts.hideDialog();
+                	}
+                	
+	            default:
+	                super.handleMessage(msg);
+	            }
         }
     }
 }

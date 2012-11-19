@@ -53,4 +53,16 @@
     android:id="@+id/angle"
     />
 
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="Meine Richtung"
+    />
+
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/myDirection"
+    />
+
 </LinearLayout>

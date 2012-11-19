@@ -19,14 +19,15 @@ public class Alerts {
 	}
 	
 	public static void showDialog(String message) {
- 
+ System.out.println("oki");
 		if(Alerts.alertDialog == null ||!Alerts.alertDialog.isShowing()) {
 
 			alertDialogBuilder.setMessage(message);
-			
+			System.out.println("doki");
 			Alerts.alertDialog = alertDialogBuilder.create();
-			
+			System.out.println("woki");
 			Alerts.alertDialog.show();
+			System.out.println("hהההה?");
 		}
 	}
 	

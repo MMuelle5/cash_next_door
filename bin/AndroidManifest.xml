@@ -11,6 +11,10 @@
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>  
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>  
   <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"></uses-permission>  
+  <uses-permission android:name="android.permission.CAMERA"/>
+  
+	<uses-feature android:name="android.hardware.camera" />
+	<uses-feature android:name="android.hardware.camera.autofocus" />
   
     <application
         android:icon="@drawable/ic_launcher"
@@ -27,9 +31,11 @@
         </activity>
         
         <activity android:name=".ViewActivity" />
+        
+        <activity android:name=".CameraActivity" />
        
 		<service android:name=".service.GpsService" android:process=":gpsService"></service>
-		<service android:name=".service.SensorService" android:process=":SensorService"></service>
+		<service android:name=".service.SensorService" android:process=":sensorService"></service>
     </application>
 
 </manifest>
