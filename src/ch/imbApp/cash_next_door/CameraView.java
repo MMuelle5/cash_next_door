@@ -6,6 +6,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.view.View;
 
+@Deprecated
 public class CameraView extends View {
 
 	private Camera camera;

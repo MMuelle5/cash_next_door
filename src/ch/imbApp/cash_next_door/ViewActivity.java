@@ -8,8 +8,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -19,6 +17,10 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.WindowManager.LayoutParams;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.imbApp.cash_next_door.alert.Alerts;
 import ch.imbApp.cash_next_door.bean.BankOmat;
@@ -50,25 +52,42 @@ public class ViewActivity extends Activity {
     final Messenger mGpsMessenger = new Messenger(new IncomingGpsHandler());
     final Messenger mSensorMessenger = new Messenger(new IncomingSensorHandler());
     private double myDirection;
-    private Camera camera;
+
+	 private CameraPreview camPreview; 
+	 private LinearLayout mainLayout;
     
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
 		context = this;
+
+		  setContentView(R.layout.activity_view);  
 		
-		CameraView cv = new CameraView(this);
+//		CameraView cv = new CameraView(this);
 //		setContentView(cv);
 		
+       
+//		  SurfaceView camView = new SurfaceView(this);
+//		  SurfaceHolder camHolder = camView.getHolder();
+//		  camPreview = new CameraPreview();         
+//		  camHolder.addCallback(camPreview);
+//		  mainLayout = (LinearLayout) findViewById(R.id.frameLayout2);
+//
+//		  mainLayout.addView(camView, new LayoutParams());
+		  
+		  
+		  
+//		  mainLayout.addView(camView, mainLayout.getWidth(), mainLayout.getHeight());
 		
 		
-		setContentView(R.layout.activity_view);
+		
 		lat = (TextView) findViewById(R.id.latitude);
 		lon = (TextView) findViewById(R.id.longitude);
 		distance = (TextView) findViewById(R.id.distance);
 		angle = (TextView) findViewById(R.id.angle);
 		myDirectionText = (TextView) findViewById(R.id.myDirection);
+//		myDirectionText.setBackgroundColor(android.R.color.transparent);
 
 	    Alerts.init(context);
 
@@ -76,7 +95,8 @@ public class ViewActivity extends Activity {
 		startService(new Intent(context, SensorService.class));
 		startService(new Intent(context, GpsService.class));
 		
-        doBindService();
+        doBindService();        
+
 	}
 	
     void doBindService() {
