@@ -15,13 +15,15 @@ public class AutomatenLoader {
 		val.setLocation(new Location("dummy"));
 		val.getLocation().setLatitude(47.377847d);
 		val.getLocation().setLongitude(8.532292d);
+		val.setBank("UUUBEEEÄÄÄSS");
 		retList.add(val);
 		
-//		val = new BankOmat();
-//		val.setLocation(new Location("dummy"));
-//		val.getLocation().setLatitude(42.22d);
-//		val.getLocation().setLongitude(42.221d);
-//		retList.add(val);
+		val = new BankOmat();
+		val.setLocation(new Location("dummy"));
+		val.setBank("CEEEEÄSS");
+		val.getLocation().setLatitude(47.377847d);
+		val.getLocation().setLongitude(8.540078d);
+		retList.add(val);
 		
 		return retList;
 	}

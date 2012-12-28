@@ -81,12 +81,17 @@ public class GpsService extends Service implements LocationListener {
         
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         System.out.println("enabled"+enabled);
-		if (!enabled) {
-//		  Intent in = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-		  startActivity(intent);
-    	}
+//		if (!enabled) {
+////		  Intent in = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//		  startActivity(intent);
+//    	}
 
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        if(enabled) {
+        	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        }
+        else {
+        	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+        }
 
 	    Criteria criteria = new Criteria();
 	    String provider = locationManager.getBestProvider(criteria, false);

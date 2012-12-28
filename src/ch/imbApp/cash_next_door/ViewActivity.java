@@ -82,9 +82,9 @@ public class ViewActivity extends Activity {
 		
 		
 		
-		lat = (TextView) findViewById(R.id.latitude);
-		lon = (TextView) findViewById(R.id.longitude);
-		distance = (TextView) findViewById(R.id.distance);
+//		lat = (TextView) findViewById(R.id.latitude);
+//		lon = (TextView) findViewById(R.id.longitude);
+//		distance = (TextView) findViewById(R.id.distance);
 		angle = (TextView) findViewById(R.id.angle);
 		myDirectionText = (TextView) findViewById(R.id.myDirection);
 //		myDirectionText.setBackgroundColor(android.R.color.transparent);
