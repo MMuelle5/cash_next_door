@@ -31,12 +31,7 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 		  
 		   
 		  parameters = mCamera.getParameters();
-		  System.out.println(parameters.getSceneMode());
-		  System.out.println("list:");
-		  System.out.println();
-		  for(String s : parameters.getSupportedSceneModes()) {
-		  System.out.println(s);
-		  }
+
 		  // Set the camera preview size
 //		  parameters.setPreviewSize(previewSizeWidth, previewSizeHeight);
 //		  // Set the take picture size, you can set the large size of the camera supported.
@@ -72,7 +67,8 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 	}
 
 	public void surfaceDestroyed(SurfaceHolder arg0) {
-		// TODO Auto-generated method stub
+		mCamera.release();
+		mCamera = null;
 	}
 
 	// Take picture interface

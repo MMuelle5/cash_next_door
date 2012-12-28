@@ -116,12 +116,12 @@ public class AutomatenLoader {
 		val.setLocation(new Location("dummy"));
 		val.getLocation().setLatitude(47.377847d);
 		val.getLocation().setLongitude(8.532292d);
-		val.setBankName("UUUBEEE���SS");
+		val.setBankName("UUUBEEESS");
 		retList.add(val);
 
 		val = new BankOmat();
 		val.setLocation(new Location("dummy"));
-		val.setBankName("CEEEE�SS");
+		val.setBankName("CEEEESS");
 		val.getLocation().setLatitude(47.377847d);
 		val.getLocation().setLongitude(8.540078d);
 		retList.add(val);

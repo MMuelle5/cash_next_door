@@ -190,6 +190,10 @@ public class CameraActivity extends Activity {
 						myLoc.setLongitude(msg.getData().getDouble("longitude"));
 						//            		lon.setText(String.valueOf(msg.getData().getDouble("longitude")));
 					}
+					else if(msg.getData().getFloat("direction") != 0d) {// waere nur mit gps moeglich
+						myLoc.setBearing(msg.getData().getFloat("direction"));
+//						myDirectionText.setText(msg.getData().getFloat("direction") + "°");
+					}
 
 					break;
 				default:
@@ -213,9 +217,9 @@ public class CameraActivity extends Activity {
 			switch (msg.what) {
 				case SensorService.MSG_SET_STRING_VALUE:
 
-					if (msg.getData().getDouble("x") != 0d) {
-						double x = msg.getData().getDouble("x");
-						myDirectionText.setText(myDirection + "�");
+					if (msg.getData().getDouble("azimuth") != 0d) {
+						double x = msg.getData().getDouble("azimuth");
+						myDirectionText.setText(myDirection + "°");
 						myDirection = x;
 						moved();
 					}
@@ -253,7 +257,7 @@ public class CameraActivity extends Activity {
 					CalcAngle.uptDateBankOmatInfos(myLoc, machine);
 
 					pointTextAlreadyDisplayed(machine);
-					angle.setText(machine.getDirection() + "�");
+					angle.setText(machine.getDirection() + "°");
 
 				}
 			}
@@ -266,7 +270,7 @@ public class CameraActivity extends Activity {
 					CalcAngle.uptDateBankOmatInfos(myLoc, machine);
 
 					pointText(machine);
-					angle.setText(machine.getDirection() + "�");
+					angle.setText(machine.getDirection() + "°");
 
 				}
 			}
@@ -280,7 +284,7 @@ public class CameraActivity extends Activity {
 	 * @param machine
 	 */
 	private void pointTextAlreadyDisplayed(BankOmat machine) {
-		double totDir = machine.getDirection() - myDirection;
+		double totDir = machine.getDirection() - myDirection;//myLoc.getBearing();
 
 		if (totDir < cameraAngle / 2 && totDir > cameraAngle / -2) {
 			//    		int width = (int) (xWith /54.8);

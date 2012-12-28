@@ -48,23 +48,45 @@ public class SensorService  extends Service implements SensorEventListener {
     private float[] geomag = new float[3];
     private float[] rotationMatrix = new float[16];
     
+    
+    public static float swRoll;
+    public static float swPitch;
+    public static float swAzimuth;
+
+    public static Sensor accelerometer;
+    public static Sensor magnetometer;
+
+    public static float[] mAccelerometer = null;
+    public static float[] mGeomagnetic = null;
+    
+
+    private double roll;
+    
 	/** Called when the activity is first created. */
 
 	public int onStartCommand(final Intent intent, final int flags, final int startId) {
 
 		Log.i(TAG, "onCreate");
 
-//	    SensorManager.getRotationMatrix(rMatrix, null, accelerometerValues, magneticValues);
-//	    SensorManager.remapCoordinateSystem(rMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, outR);
-//	    SensorManager.getOrientation(outR, orientationValues);
-	    sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-	    lastUpdate = System.currentTimeMillis();
-	    System.out.println(sensorManager);
+////	    SensorManager.getRotationMatrix(rMatrix, null, accelerometerValues, magneticValues);
+////	    SensorManager.remapCoordinateSystem(rMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, outR);
+////	    SensorManager.getOrientation(outR, orientationValues);
+//	    sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+//	    lastUpdate = System.currentTimeMillis();
+//	    System.out.println(sensorManager);
+//
+//
+//	    sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+//	    sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
 
+	    sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+	    accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+	    magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+	    
+	    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+	    sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
 
-	    sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
-	    sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-	  
+	  System.out.println("ok, durch");
 		return START_STICKY;
 	  }
 
@@ -73,74 +95,37 @@ public class SensorService  extends Service implements SensorEventListener {
 //	    if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
 //	      getAccelerometer(event);
 //	    }
-	    /**
-	     * Start test
-	     */
-		    int type=event.sensor.getType();
-		    
-		    //Smoothing the sensor data a bit
-		    if (type == Sensor.TYPE_MAGNETIC_FIELD) {
-		      geomag[0]=(geomag[0]*1+event.values[0])*0.5f;
-		      geomag[1]=(geomag[1]*1+event.values[1])*0.5f;
-		      geomag[2]=(geomag[2]*1+event.values[2])*0.5f;
-		    } else if (type == Sensor.TYPE_ACCELEROMETER) {
-		      gravity[0]=(gravity[0]*2+event.values[0])*0.33334f;
-		      gravity[1]=(gravity[1]*2+event.values[1])*0.33334f;
-		      gravity[2]=(gravity[2]*2+event.values[2])*0.33334f;
+
+		    // onSensorChanged gets called for each sensor so we have to remember the values
+		    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+		        mAccelerometer = event.values;
+		    }
+
+		    if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+		        mGeomagnetic = event.values;
+		    }
+
+		    if (mAccelerometer != null && mGeomagnetic != null) {
+		        float R[] = new float[9];
+		        float I[] = new float[9];
+		        boolean success = SensorManager.getRotationMatrix(R, I, mAccelerometer, mGeomagnetic);
+
+		        if (success) {
+		            float orientation[] = new float[3];
+		            SensorManager.getOrientation(R, orientation);
+		            // at this point, orientation contains the azimuth(direction), pitch and roll values.
+		              azimuth = 180 * orientation[0] / Math.PI;
+		              pitch = 180 * orientation[1] / Math.PI;
+		              roll = 180 * orientation[2] / Math.PI;
+		              sendMessageToUI();
+		        }
 		    }
 		    
-		    if ((type==Sensor.TYPE_MAGNETIC_FIELD) || (type==Sensor.TYPE_ACCELEROMETER)) {
-			    rotationMatrix = new float[16];
-			    SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomag);
-			    SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, rotationMatrix );
-			     
-			    SensorManager.getOrientation(rotationMatrix, values);
-			     
-			//		      System.out.println("values: "+values[0] +" "+ Math.toDegrees(values[0]));
-			      
-			    x=Math.toDegrees(values[0]);
-			     
-			    double y = Math.toDegrees(values[1]);
-				isHorizontal = y>-115 && y<-50;
-
-				sendMessageToUI();
-		    }  
 		    
-//	    if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
-//	    	return;
-//	    }
-//        switch (event.sensor.getType()) {
-//                case Sensor.TYPE_MAGNETIC_FIELD:
-//                        mags = event.values.clone();
-//                        break;
-//        case Sensor.TYPE_ACCELEROMETER:
-//                        accels = event.values.clone();
-//                        break;
-//        }
-//
-//        if (mags != null && accels != null) {
-//
-//                SensorManager.getRotationMatrix(R, I, accels, mags);
-//
-//                // Correct if screen is in Landscape
-//	                            SensorManager.remapCoordinateSystem(R, SensorManager.AXIS_X, SensorManager.AXIS_Z, outR);
-//
-//	                            float[] val = SensorManager.getOrientation(outR, values);
-//
-//	                            azimuth = Math.toDegrees(values[0]);
-////	                            System.out.println("azimuth:" +azimuth+" "+values[0]);
-//	                            System.out.println("val:" +Math.toDegrees(val[0])+" "+val[0]);
-//                pitch = Math.toDegrees(values[1]);
-////	                            roll = Math.toDegrees(values[2]);
-//
-//        		sendMessageToUI();
-//        }
-
-	    /**
-	     * End test
-	     */
 
 	  }
+	  
+	  
 
 	  private void getAccelerometer(SensorEvent event) {
 	    float[] values = event.values;
@@ -153,10 +138,11 @@ public class SensorService  extends Service implements SensorEventListener {
 		
 		sendMessageToUI();
 	  }
+	  
+	  protected void onPause() {
 
-//	  @Override
-	  public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+	      sensorManager.unregisterListener(this, accelerometer);
+	      sensorManager.unregisterListener(this, magnetometer);
 	  }
 
 	    
@@ -164,6 +150,7 @@ public class SensorService  extends Service implements SensorEventListener {
 	    	
 	    	if(mClient != null) {
 		    	Bundle b = new Bundle();
+		    	isHorizontal = pitch>-115 && pitch<-50;
 		    	if(isExceptionPopupVisible && isHorizontal) {
 		    		b.putBoolean(POPUP_FIELD, false);
 		    		isExceptionPopupVisible = false;
@@ -179,12 +166,13 @@ public class SensorService  extends Service implements SensorEventListener {
 		            sendMsg(msg);
 		    	}
 		    	
-	            b.putDouble("x",  Math.toDegrees(values[0]));
+	            b.putDouble("azimuth",  azimuth);
 	            Message msg = Message.obtain(null, MSG_SET_STRING_VALUE);
 	            msg.setData(b);
 	            sendMsg(msg);
 	    	}
 	    }
+	  
 	   
 	private void sendMsg(Message msg) {
 
@@ -218,4 +206,8 @@ public class SensorService  extends Service implements SensorEventListener {
         	mClient = msg.replyTo;
         }
     }
+
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		
+	}
 }

@@ -35,6 +35,7 @@ public class GpsService extends Service implements LocationListener {
 	public Location location;
 	public Double latitude = Double.valueOf(0d);
 	public Double longitude = Double.valueOf(0d);
+	public Float direction = Float.valueOf(0f);
 	
 	Intent intent;
 	
@@ -63,11 +64,12 @@ public class GpsService extends Service implements LocationListener {
 	}
 
 	public void onLocationChanged(Location arg0) {
-        location = arg0;  
-        System.out.println(location);
+        location = arg0;
         latitude = location.getLatitude();
         longitude = location.getLongitude();
+        direction = location.getBearing();
         
+        System.out.println("direction: "+direction+"°"+ " lat: "+latitude+" lon: "+longitude);
         sendMessageToUI();
 	}
 
@@ -77,26 +79,33 @@ public class GpsService extends Service implements LocationListener {
 		
 		this.intent = intent;
 		
-	    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        
-        boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        System.out.println("enabled"+enabled);
-//		if (!enabled) {
-////		  Intent in = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//		  startActivity(intent);
-//    	}
+		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+		String best = locationManager.getBestProvider(criteria, true);
+		locationManager.requestLocationUpdates(best, 10, 0, this);
 
-        if(enabled) {
-        	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        }
-        else {
-        	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-        }
+		
+//	    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+//        
+//        boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+//        System.out.println("enabled"+enabled);
+//
+//        System.out.println();
+//        if(enabled) {
+//        	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+//        }
+//        else {
+//        	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+//        }
+//
+//	    Criteria criteria = new Criteria();
+//	    String provider = locationManager.getBestProvider(criteria, false);
+	    Location location = locationManager.getLastKnownLocation(best);
 
-	    Criteria criteria = new Criteria();
-	    String provider = locationManager.getBestProvider(criteria, false);
-	    Location location = locationManager.getLastKnownLocation(provider);
-
+	    System.out.println("best: "+best);
+	    System.out.println(location);
 		if(location != null) {
 			onLocationChanged(location);
 		}
@@ -160,6 +169,11 @@ public class GpsService extends Service implements LocationListener {
 
                 b = new Bundle();
                 b.putDouble("longitude", longitude);
+                msg.setData(b);
+                mClients.get(i).send(msg);
+
+                b = new Bundle();
+                b.putFloat("direction", direction);
                 msg.setData(b);
                 mClients.get(i).send(msg);
                 

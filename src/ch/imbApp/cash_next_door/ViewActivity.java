@@ -174,7 +174,7 @@ public class ViewActivity extends Activity {
 
 					if (msg.getData().getDouble("x") != 0d) {
 						double x = msg.getData().getDouble("x");
-						myDirectionText.setText(myDirection + "�");
+						myDirectionText.setText(myDirection + "°");
 						myDirection = x;
 					}
 					break;
