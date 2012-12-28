@@ -182,26 +182,38 @@ public class CameraActivity extends Activity {
 			switch (msg.what) {
 				case GpsService.MSG_SET_STRING_VALUE:
 
-					if (msg.getData().getDouble("latitude") != 0d) {
-						myLoc.setLatitude(msg.getData().getDouble("latitude"));
-						//            		lat.setText(String.valueOf(msg.getData().getDouble("latitude")));
-					}
-					else if (msg.getData().getDouble("longitude") != 0d) {
-						myLoc.setLongitude(msg.getData().getDouble("longitude"));
-						//            		lon.setText(String.valueOf(msg.getData().getDouble("longitude")));
-					}
-					else if(msg.getData().getFloat("direction") != 0d) {// waere nur mit gps moeglich
-						myLoc.setBearing(msg.getData().getFloat("direction"));
-//						myDirectionText.setText(msg.getData().getFloat("direction") + "°");
-					}
+//					if (msg.getData().getDouble("latitude") != 0d) {
+//						myLoc.setLatitude(msg.getData().getDouble("latitude"));
+//					}
+//					else if (msg.getData().getDouble("longitude") != 0d) {
+//						myLoc.setLongitude(msg.getData().getDouble("longitude"));
+//					}
+//					else if(msg.getData().getFloat("direction") != 0d) {// waere nur mit gps moeglich
+//						myLoc.setBearing(msg.getData().getFloat("direction"));
+////						myDirectionText.setText(msg.getData().getFloat("direction") + "°");
+//					}
+					
+					double[] loc = msg.getData().getDoubleArray("location");
+					myLoc.setLongitude(loc[0]);
+					myLoc.setLatitude(loc[1]);
 
 					break;
 				default:
 					super.handleMessage(msg);
 			}
-
-			if (lastPosLoaded == null || lastPosLoaded.distanceTo(myLoc) > 0) {
+System.out.println("myLoc: "+myLoc);
+System.out.println("lastPosLoaded: "+lastPosLoaded);
+			if(lastPosLoaded != null) {
+			System.out.println(lastPosLoaded.distanceTo(myLoc));
+			}
+			
+			if (lastPosLoaded == null ){
+				lastPosLoaded = new Location("LAST");
+			}
+			else if (lastPosLoaded.distanceTo(myLoc) > 2) {
 				hiddenCashMachines = AutomatenLoader.getBankomaten(myLoc);
+				lastPosLoaded.setLatitude(myLoc.getLatitude());
+				lastPosLoaded.setLongitude(myLoc.getLongitude());
 			}
 
 			moved();
@@ -246,7 +258,7 @@ public class CameraActivity extends Activity {
 
 		if (lastRefresh.before(new Date())) {
 			lastRefresh = new Date();
-			lastRefresh = new Date(lastRefresh.getTime() + 300);//"nur" alle 0.3 sec einen refresh durchf�hren
+			lastRefresh = new Date(lastRefresh.getTime() + 100);//"nur" alle 0.1 sec einen refresh durchf�hren
 
 			if (visibleCashMachines != null && visibleCashMachines.size() > 0) {
 				for (int i = visibleCashMachines.size() - 1; i >= 0; i--) {
@@ -330,6 +342,5 @@ public class CameraActivity extends Activity {
 		MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
 		params.leftMargin = (int) (width * totDir + xWith / 2);
 		bankOmat.setLayoutParams(params);
-
 	}
 }

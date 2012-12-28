@@ -84,7 +84,7 @@ public class GpsService extends Service implements LocationListener {
 		criteria.setAccuracy(Criteria.ACCURACY_FINE);
 		criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
 		String best = locationManager.getBestProvider(criteria, true);
-		locationManager.requestLocationUpdates(best, 10, 0, this);
+		locationManager.requestLocationUpdates(best, 0, 0, this);
 
 		
 //	    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -162,20 +162,21 @@ public class GpsService extends Service implements LocationListener {
 
                 //Send values
                 Bundle b = new Bundle();
-                b.putDouble("latitude", latitude);
+                b.putDoubleArray("location", new double[]{longitude, latitude});
+//                b.putDouble("latitude", latitude);
                 Message msg = Message.obtain(null, MSG_SET_STRING_VALUE);
                 msg.setData(b);
                 mClients.get(i).send(msg);
 
-                b = new Bundle();
-                b.putDouble("longitude", longitude);
-                msg.setData(b);
-                mClients.get(i).send(msg);
-
-                b = new Bundle();
-                b.putFloat("direction", direction);
-                msg.setData(b);
-                mClients.get(i).send(msg);
+//                b = new Bundle();
+//                b.putDouble("longitude", longitude);
+//                msg.setData(b);
+//                mClients.get(i).send(msg);
+//
+//                b = new Bundle();
+//                b.putFloat("direction", direction);
+//                msg.setData(b);
+//                mClients.get(i).send(msg);
                 
             } catch (RemoteException e) {
             	e.printStackTrace();

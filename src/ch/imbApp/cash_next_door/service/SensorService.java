@@ -41,6 +41,7 @@ public class SensorService  extends Service implements SensorEventListener {
     float[] values = new float[3];
     private double azimuth;
     private double pitch;
+    private double lastAzimuthUpd;
     private float[] accels;
     private float[] mags;
 	  
@@ -166,10 +167,12 @@ public class SensorService  extends Service implements SensorEventListener {
 		            sendMsg(msg);
 		    	}
 		    	
-	            b.putDouble("azimuth",  azimuth);
-	            Message msg = Message.obtain(null, MSG_SET_STRING_VALUE);
-	            msg.setData(b);
-	            sendMsg(msg);
+		    	if(lastAzimuthUpd - azimuth > 2 || lastAzimuthUpd - azimuth < -2) {
+		            b.putDouble("azimuth",  azimuth);
+		            Message msg = Message.obtain(null, MSG_SET_STRING_VALUE);
+		            msg.setData(b);
+		            sendMsg(msg);
+		    	}
 	    	}
 	    }
 	  
