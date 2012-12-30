@@ -2,8 +2,17 @@ package ch.imbApp.cash_next_door.calc;
 
 import android.location.Location;
 import ch.imbApp.cash_next_door.bean.BankOmat;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class AutomatenLoader {
 
@@ -24,6 +33,8 @@ public class AutomatenLoader {
 				+ "&sensor=" + sensor
 				+ "&key=" + key;
 
+		//JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
+		
 		/*
 		 * Request for Google Places API
 		 * 
@@ -127,5 +138,43 @@ public class AutomatenLoader {
 		retList.add(val);
 
 		return retList;
+	}
+	
+	public static JSONObject makeHttpJsonRequest(String url) {
+		String myContent = "";
+		JSONObject jsonObject = null;
+		
+		try {
+			URL requestUrl = new URL(url);
+			URLConnection connection = requestUrl.openConnection();
+			InputStream input = connection.getInputStream();
+			int c;
+			int len = connection.getContentLength(); 
+			
+			if (len > 0) {  
+				int i = len; 
+				while (((c = input.read()) != -1) && (--i > 0)) { 
+					myContent += (char) c; 
+				} 
+				input.close(); 
+			} else { 
+				return null;
+			} 
+
+			jsonObject = new JSONObject(myContent);
+			
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return jsonObject;
+
 	}
 }

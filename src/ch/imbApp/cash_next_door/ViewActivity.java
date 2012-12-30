@@ -160,7 +160,6 @@ public class ViewActivity extends Activity {
 				System.out.println(myAngle);
 				angle.setText(myAngle + "�");
 			}
-
 		}
 	}
 

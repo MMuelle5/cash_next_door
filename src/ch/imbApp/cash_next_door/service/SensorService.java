@@ -87,7 +87,7 @@ public class SensorService  extends Service implements SensorEventListener {
 	    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
 	    sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
 
-	  System.out.println("ok, durch");
+	    System.out.println("Listeners registred!");
 		return START_STICKY;
 	  }
 
