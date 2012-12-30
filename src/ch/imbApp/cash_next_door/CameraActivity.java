@@ -20,6 +20,7 @@ import ch.imbApp.cash_next_door.alert.Alerts;
 import ch.imbApp.cash_next_door.bean.BankOmat;
 import ch.imbApp.cash_next_door.calc.AutomatenLoader;
 import ch.imbApp.cash_next_door.calc.CalcAngle;
+import ch.imbApp.cash_next_door.helper.Timer;
 import ch.imbApp.cash_next_door.service.GpsService;
 import ch.imbApp.cash_next_door.service.SensorService;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class CameraActivity extends Activity {
 	private List<TextView> unusedTextList = Collections.synchronizedList(new ArrayList<TextView>());
 	private int xWith;
 
-	private Date lastRefresh = new Date();
+	private Timer timer = new Timer(100);
 
 	Messenger mService = null;
 	Messenger mSensorService = null;
@@ -201,8 +202,7 @@ public class CameraActivity extends Activity {
 				default:
 					super.handleMessage(msg);
 			}
-System.out.println("myLoc: "+myLoc);
-System.out.println("lastPosLoaded: "+lastPosLoaded);
+
 			if(lastPosLoaded != null) {
 			System.out.println(lastPosLoaded.distanceTo(myLoc));
 			}
@@ -210,7 +210,7 @@ System.out.println("lastPosLoaded: "+lastPosLoaded);
 			if (lastPosLoaded == null ){
 				lastPosLoaded = new Location("LAST");
 			}
-			else if (lastPosLoaded.distanceTo(myLoc) > 2) {
+			else if (lastPosLoaded.distanceTo(myLoc) > 20) { //nur alle 20 m?
 				hiddenCashMachines = AutomatenLoader.getBankomaten(myLoc);
 				lastPosLoaded.setLatitude(myLoc.getLatitude());
 				lastPosLoaded.setLongitude(myLoc.getLongitude());
@@ -256,10 +256,8 @@ System.out.println("lastPosLoaded: "+lastPosLoaded);
 			return;
 		}
 
-		if (lastRefresh.before(new Date())) {
-			lastRefresh = new Date();
-			lastRefresh = new Date(lastRefresh.getTime() + 100);//"nur" alle 0.1 sec einen refresh durchf�hren
-
+		if (timer.isTimeReached()) {
+			
 			if (visibleCashMachines != null && visibleCashMachines.size() > 0) {
 				for (int i = visibleCashMachines.size() - 1; i >= 0; i--) {
 					//		        for(BankOmat machine: visibleCashMachines) {
@@ -297,7 +295,7 @@ System.out.println("lastPosLoaded: "+lastPosLoaded);
 	 */
 	private void pointTextAlreadyDisplayed(BankOmat machine) {
 		double totDir = machine.getDirection() - myDirection;//myLoc.getBearing();
-
+System.out.println(totDir +" "+ cameraAngle / 2);
 		if (totDir < cameraAngle / 2 && totDir > cameraAngle / -2) {
 			//    		int width = (int) (xWith /54.8);
 			//    		TextView bankOmat = machine.getDisplayedView();
@@ -337,10 +335,16 @@ System.out.println("lastPosLoaded: "+lastPosLoaded);
 	}
 
 	private void displayText(BankOmat machine, TextView bankOmat, double totDir) {
-		int width = (int) (xWith / 54.8);
+		int widthPerDegree = (int) (xWith / 54.8);
 		bankOmat.setText(machine.getBankName() + "\n" + machine.getDistance());
 		MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
-		params.leftMargin = (int) (width * totDir + xWith / 2);
+//		params.leftMargin = (int) (width * totDir + xWith / 2);
+		if(totDir < 0) {
+			params.leftMargin = (int) (widthPerDegree * totDir * -1);
+		}
+		else {
+			params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
+		}
 		bankOmat.setLayoutParams(params);
 	}
 }

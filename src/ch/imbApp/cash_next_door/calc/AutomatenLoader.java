@@ -1,12 +1,25 @@
 package ch.imbApp.cash_next_door.calc;
 
-import android.location.Location;
-import ch.imbApp.cash_next_door.bean.BankOmat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+
+import android.location.Location;
+import ch.imbApp.cash_next_door.bean.BankOmat;
+
 public class AutomatenLoader {
 
+	private static XPathFactory factory;
+	private static XPath xpath;
+	
+	public static void init() {
+		factory = XPathFactory.newInstance();
+		xpath = factory.newXPath();
+	}
+
+	
 	public static List<BankOmat> getBankomaten(Location loc) {
 		List<BankOmat> retList = new ArrayList<BankOmat>();
 
@@ -23,7 +36,8 @@ public class AutomatenLoader {
 				+ "&types=" + types
 				+ "&sensor=" + sensor
 				+ "&key=" + key;
-
+System.out.println(requestUrl);
+		
 		/*
 		 * Request for Google Places API
 		 * 

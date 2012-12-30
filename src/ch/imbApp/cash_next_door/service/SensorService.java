@@ -1,5 +1,6 @@
 package ch.imbApp.cash_next_door.service;
 
+import ch.imbApp.cash_next_door.helper.Timer;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
@@ -60,7 +61,7 @@ public class SensorService  extends Service implements SensorEventListener {
     public static float[] mAccelerometer = null;
     public static float[] mGeomagnetic = null;
     
-
+    private Timer timer = new Timer(100);
     private double roll;
     
 	/** Called when the activity is first created. */
@@ -149,7 +150,7 @@ public class SensorService  extends Service implements SensorEventListener {
 	    
 	    private void sendMessageToUI() {
 	    	
-	    	if(mClient != null) {
+	    	if(mClient != null && timer.isTimeReached()) {
 		    	Bundle b = new Bundle();
 		    	isHorizontal = pitch>-115 && pitch<-50;
 		    	if(isExceptionPopupVisible && isHorizontal) {
