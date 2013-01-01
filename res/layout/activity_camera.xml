@@ -15,6 +15,14 @@
     android:layout_weight="1"
     android:orientation="horizontal" >
 
+<!--      <ProgressBar -->
+<!--          android:layout_width="wrap_content" -->
+<!--          android:layout_height="wrap_content" -->
+<!--          style="@android:style/Widget.ProgressBar.Small" -->
+<!--          android:id="@+id/lin_progress_bar" -->
+<!--          android:layout_marginRight="5dp" /> -->
+
+     
     <include
         android:id="@+id/view_layout"
         layout="@layout/activity_view" />

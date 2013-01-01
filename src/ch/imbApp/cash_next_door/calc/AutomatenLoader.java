@@ -1,41 +1,27 @@
 package ch.imbApp.cash_next_door.calc;
 
-<<<<<<< HEAD
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
-
-import android.location.Location;
-import ch.imbApp.cash_next_door.bean.BankOmat;
-=======
-import android.location.Location;
-import ch.imbApp.cash_next_door.bean.BankOmat;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
->>>>>>> 43892c6991a3d5b4032fa1d885d7395f44fc0f99
 
-public class AutomatenLoader {
+import android.location.Location;
+import ch.imbApp.cash_next_door.bean.BankOmat;
 
-	private static XPathFactory factory;
-	private static XPath xpath;
+public class AutomatenLoader implements Runnable{
+
+	public List<BankOmat> machineList = new ArrayList<BankOmat>();
 	
-	public static void init() {
-		factory = XPathFactory.newInstance();
-		xpath = factory.newXPath();
-	}
-
 	
+	@Deprecated
 	public static List<BankOmat> getBankomaten(Location loc) {
 		List<BankOmat> retList = new ArrayList<BankOmat>();
 
@@ -52,12 +38,10 @@ public class AutomatenLoader {
 				+ "&types=" + types
 				+ "&sensor=" + sensor
 				+ "&key=" + key;
-<<<<<<< HEAD
-System.out.println(requestUrl);
-=======
 
-		//JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
->>>>>>> 43892c6991a3d5b4032fa1d885d7395f44fc0f99
+//		JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
+//		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
+
 		
 		/*
 		 * Request for Google Places API
@@ -201,4 +185,71 @@ System.out.println(requestUrl);
 		return jsonObject;
 
 	}
+
+	
+	
+	
+	
+	
+	
+	public void run() {
+
+		machineList = new ArrayList<BankOmat>();
+
+		String requestUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?";
+		//String location = loc.getLatitude() + "," + loc.getLongitude();
+		String location = "47.392132,8.518366";
+		String rankby = "distance";
+		String types = "atm";
+		String sensor = "true";
+		String apiKey = "AIzaSyC5yZvpQSXq8e1x1LZTPXsSt6o0YohBNns"; // my personal API Key... is limited!!!
+
+		requestUrl += "location=" + location
+				+ "&rankby=" + rankby
+				+ "&types=" + types
+				+ "&sensor=" + sensor
+				+ "&key=" + apiKey;
+
+//		JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
+		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
+
+		try {
+			JSONArray resultArray = (JSONArray) jsonObject.get("results");
+
+			for (int i = 0; i < resultArray.length(); i++) {
+				JSONObject result = resultArray.getJSONObject(i);
+
+				Iterator<?> keys = result.keys();
+
+	        	BankOmat machine = new BankOmat();
+	        	
+		        while(keys.hasNext()) {
+		            String key = (String) keys.next();
+		            
+		            if("name".equals(key)){
+		            	machine.setBankName((String) result.get(key));
+		            }
+		            
+		            if("vicinity".equals(key)){
+		            	machine.setBankAddress((String) result.get(key));
+		            }
+		            
+		            if("geometry".equals(key)){
+		            	JSONObject locationObject = (JSONObject) result.get(key);
+		            	JSONObject coordinates = (JSONObject) locationObject.get("location");
+		            	Location loc = new Location("google");
+		            	loc.setLatitude((Double) coordinates.get("lat"));
+		            	loc.setLongitude((Double) coordinates.get("lng"));
+		            	
+		            	machine.setLocation(loc);
+		            }
+		        }
+		        
+		        machineList.add(machine);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

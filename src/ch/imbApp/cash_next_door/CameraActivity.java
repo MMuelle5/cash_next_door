@@ -1,7 +1,12 @@
 package ch.imbApp.cash_next_door;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -9,11 +14,19 @@ import android.content.ServiceConnection;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.*;
-import android.view.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.view.Display;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.imbApp.cash_next_door.alert.Alerts;
@@ -23,10 +36,6 @@ import ch.imbApp.cash_next_door.calc.CalcAngle;
 import ch.imbApp.cash_next_door.helper.Timer;
 import ch.imbApp.cash_next_door.service.GpsService;
 import ch.imbApp.cash_next_door.service.SensorService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 @TargetApi(13)
 public class CameraActivity extends Activity {
@@ -41,6 +50,7 @@ public class CameraActivity extends Activity {
 	//		private TextView distance;
 	private TextView angle;
 	private TextView myDirectionText;
+    private ProgressBar mProgress;
 	//		private TextView lonText;
 
 	private Location myLoc;
@@ -58,6 +68,9 @@ public class CameraActivity extends Activity {
 	final Messenger mSensorMessenger = new Messenger(new IncomingSensorHandler());
 	private double myDirection;
 	private double cameraAngle = 54.8;
+	
+	private AutomatenLoader loader = new AutomatenLoader();
+	private Thread thread = new Thread(loader);
 
 	//	 private Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -94,6 +107,8 @@ public class CameraActivity extends Activity {
 
 		doViewActivities();
 		relativeLayoutSensorsData.bringToFront();
+		updateHiddenList();
+
 	}
 
 	private void doViewActivities() {
@@ -102,6 +117,7 @@ public class CameraActivity extends Activity {
 		//		distance = (TextView) findViewById(R.id.distance);
 		angle = (TextView) findViewById(R.id.angle);
 		myDirectionText = (TextView) findViewById(R.id.myDirection);
+//		mProgress = (ProgressBar) findViewById(R.id.lin_progress_bar);
 		//		lonText = (TextView) findViewById(R.id.longitudeText);
 		unusedTextList.add((TextView) findViewById(R.id.cashOmat1));
 		unusedTextList.add((TextView) findViewById(R.id.cashOmat2));
@@ -112,22 +128,28 @@ public class CameraActivity extends Activity {
 		System.out.println("sensor start");
 		startService(new Intent(context, SensorService.class));
 		startService(new Intent(context, GpsService.class));
-
-		//FIXME wider ausbauen
-		System.out.println("call getBancomaten!");
-		hiddenCashMachines = AutomatenLoader.getBankomaten(myLoc);
-
-		//        myLoc = new Location("dummy");
-		//        myLoc.setLatitude(47.377778d);
-		//        myLoc.setLongitude(8.540278d); 
-		//        for(BankOmat machine: hiddenCashMachines) {
-		////        	distance.setText(myLoc.distanceTo(machine.getLocation())+" Meter");
-		//        	double myAngle = CalcAngle.calcAngle(myDirection, myLoc, machine.getLocation());
-		//        	System.out.println(myAngle);
-		//            angle.setText(myAngle + "�");
-		//        }
-
+		
 		doBindService();
+	}
+
+	private void updateHiddenList() {    
+		
+		thread.start();   
+		
+		ProgressDialog pd = ProgressDialog.show(context, "Bitte warten...", "Daten werden aktualisiert", true, false);
+    
+		while(loader.machineList == null || loader.machineList.size() ==0) {
+	        try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+	
+		}
+	
+		hiddenCashMachines = loader.machineList;
+		pd.dismiss();
+		
 	}
 
 	void doBindService() {
@@ -183,17 +205,6 @@ public class CameraActivity extends Activity {
 
 			switch (msg.what) {
 				case GpsService.MSG_SET_STRING_VALUE:
-
-//					if (msg.getData().getDouble("latitude") != 0d) {
-//						myLoc.setLatitude(msg.getData().getDouble("latitude"));
-//					}
-//					else if (msg.getData().getDouble("longitude") != 0d) {
-//						myLoc.setLongitude(msg.getData().getDouble("longitude"));
-//					}
-//					else if(msg.getData().getFloat("direction") != 0d) {// waere nur mit gps moeglich
-//						myLoc.setBearing(msg.getData().getFloat("direction"));
-////						myDirectionText.setText(msg.getData().getFloat("direction") + "°");
-//					}
 					
 					double[] loc = msg.getData().getDoubleArray("location");
 					myLoc.setLongitude(loc[0]);
@@ -212,7 +223,7 @@ public class CameraActivity extends Activity {
 				lastPosLoaded = new Location("LAST");
 			}
 			else if (lastPosLoaded.distanceTo(myLoc) > 20) { //nur alle 20 m?
-				hiddenCashMachines = AutomatenLoader.getBankomaten(myLoc);
+				updateHiddenList();
 				lastPosLoaded.setLatitude(myLoc.getLatitude());
 				lastPosLoaded.setLongitude(myLoc.getLongitude());
 			}
@@ -339,7 +350,7 @@ System.out.println(totDir +" "+ cameraAngle / 2);
 		int widthPerDegree = (int) (xWith / 54.8);
 		bankOmat.setText(machine.getBankName() + "\n" + machine.getDistance());
 		MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
-//		params.leftMargin = (int) (width * totDir + xWith / 2);
+
 		if(totDir < 0) {
 			params.leftMargin = (int) (widthPerDegree * totDir * -1);
 		}
