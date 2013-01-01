@@ -84,7 +84,7 @@ public class CameraActivity extends Activity {
 		mainLayout = (FrameLayout) findViewById(R.id.camera_preview);
 		mainLayout.addView(camView, new LayoutParams());
 
-		//FIXME Kamerawinkel wurde mit parameters.getHorizontalViewAngle()); f�r mein Phone geholt (54.8%)		  
+		//FIXME Kamerawinkel wurde mit parameters.getHorizontalViewAngle()); für mein Phone geholt (54.8%)		  
 		Display disp = this.getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		disp.getSize(size);
@@ -114,6 +114,7 @@ public class CameraActivity extends Activity {
 		startService(new Intent(context, GpsService.class));
 
 		//FIXME wider ausbauen
+		System.out.println("call getBancomaten!");
 		hiddenCashMachines = AutomatenLoader.getBankomaten(myLoc);
 
 		//        myLoc = new Location("dummy");
