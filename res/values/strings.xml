@@ -9,4 +9,7 @@
 	<string name="latitude">Breitengrad: </string>
 	<string name="distance">Distanz zum nächsten Automaten: </string>
 	<string name="beenden">Beenden</string>
+	<string name="info">Info</string>
+	<string name="locationWarning">Ihr Standort konnte noch nicht ermittelt werden.\nBitte haben Sie etwas Geduld.</string>
+	<string name="machinesUpdated">Die Liste der Bankomaten wurde aktualisiert</string>
 </resources>

@@ -27,13 +27,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import ch.imbApp.cash_next_door.alert.Alerts;
 import ch.imbApp.cash_next_door.bean.BankOmat;
+import ch.imbApp.cash_next_door.bean.TextBean;
 import ch.imbApp.cash_next_door.calc.AutomatenLoader;
 import ch.imbApp.cash_next_door.calc.CalcAngle;
 import ch.imbApp.cash_next_door.helper.Timer;
@@ -52,7 +56,7 @@ public class CameraActivity extends Activity {
 	private Location myLoc;
 	private Location lastPosLoaded;
 	private List<BankOmat> cashMachines = Collections.synchronizedList(new ArrayList<BankOmat>());
-	private List<TextView> unusedTextList = Collections.synchronizedList(new ArrayList<TextView>());
+	private List<TextBean> unusedTextList = Collections.synchronizedList(new ArrayList<TextBean>());
 	private int xWith;
 
 	private Timer timer = new Timer(100);
@@ -93,37 +97,6 @@ public class CameraActivity extends Activity {
 
 	}
 
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_main, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	        case R.id.destroyMe:
-	            stopAll();
-	            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
-	}
-
-	private void stopAll() {
-		unbindService(mGpsConnection);
-		unbindService(mSensorConnection);
-		
-		stopService(new Intent(context, SensorService.class));
-		stopService(new Intent(context, GpsService.class));
-		finish();
-	}
-
-
 	private void doViewActivities() {
 
 		myDirectionText = (TextView) findViewById(R.id.myDirection);
@@ -143,13 +116,23 @@ public class CameraActivity extends Activity {
 	 */
 	private void initUnusedTextFields() {
 		
-		unusedTextList = new ArrayList<TextView>();
-		unusedTextList.add((TextView) findViewById(R.id.cashOmat1));
-		unusedTextList.add((TextView) findViewById(R.id.cashOmat2));
-		unusedTextList.add((TextView) findViewById(R.id.cashOmat3));
+		unusedTextList = new ArrayList<TextBean>();
+		TextBean tb = new TextBean();
+		tb.text = (TextView) findViewById(R.id.cashOmat1);
+		tb.img = (ImageView) findViewById(R.id.imageView1);
+		unusedTextList.add(tb);
+		tb = new TextBean();
+		tb.text = (TextView) findViewById(R.id.cashOmat2);
+		tb.img = (ImageView) findViewById(R.id.imageView2);
+		unusedTextList.add(tb);
+		tb = new TextBean();
+		tb.text = (TextView) findViewById(R.id.cashOmat3);
+		tb.img = (ImageView) findViewById(R.id.imageView3);
+		unusedTextList.add(tb);
 		
-		for(TextView tv : unusedTextList) {
-			tv.setText("");
+		for(TextBean textBean : unusedTextList) {
+			textBean.text.setText("");
+			
 		}
 		
 	}
@@ -160,6 +143,7 @@ public class CameraActivity extends Activity {
 	private void updateMachineList() {    
 		
 		if(myLoc == null) {
+            Toast.makeText(CameraActivity.this, R.string.locationWarning, Toast.LENGTH_SHORT).show();
 			return;
 		}
 		
@@ -185,6 +169,8 @@ public class CameraActivity extends Activity {
 		initUnusedTextFields();
 
 		pd.dismiss();
+		
+        Toast.makeText(CameraActivity.this, R.string.machinesUpdated, Toast.LENGTH_SHORT).show();
 		
 	}
 
@@ -328,7 +314,7 @@ public class CameraActivity extends Activity {
 		double widthPerDegree = xWith / camPreview.getCameraAngel();
 
 		if (totDir < camPreview.getCameraAngel() / 2 && totDir > camPreview.getCameraAngel() / -2) {
-			TextView bankOmat;
+			TextBean bankOmat;
 			if(machine.getDisplayedView() != null) {
 				bankOmat = machine.getDisplayedView();
 			}
@@ -341,21 +327,61 @@ public class CameraActivity extends Activity {
 				machine.setDisplayedView(bankOmat);
 			}
 			
-			bankOmat.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m");
+			bankOmat.text.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m");
 			
-			MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
-			params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
+			MarginLayoutParams imgParam = (MarginLayoutParams) bankOmat.img.getLayoutParams();
+			imgParam.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
+			bankOmat.img.setLayoutParams(imgParam);
+			bankOmat.img.setVisibility(View.VISIBLE);
 			
-				
-			bankOmat.setLayoutParams(params);
-			bankOmat.setBackgroundColor(Color.GREEN);
+			MarginLayoutParams params = (MarginLayoutParams) bankOmat.text.getLayoutParams();
+			params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2 + 20);
+			bankOmat.text.setLayoutParams(params);
+
 		}
 		else if(machine.getDisplayedView() != null){
-			machine.getDisplayedView().setText("");
-			machine.getDisplayedView().setBackgroundColor(Color.TRANSPARENT);
+			machine.getDisplayedView().text.setText("");
+			machine.getDisplayedView().text.setBackgroundColor(Color.TRANSPARENT);
+			machine.getDisplayedView().img.setVisibility(View.GONE);
 			unusedTextList.add(machine.getDisplayedView());
 			machine.setDisplayedView(null);
 		}
+		
+	}
+
+
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.activity_main, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.destroyMe:
+	            stopAll();
+	            return true;
+	        case R.id.info:
+	        	String text = "INFO\n-----\nVersion: 1.0.0\n\nSeminararbeit <<Hand held>>\n\nWritten by:\n -Ramon Burri\n -Marius Mueller";
+	            Toast.makeText(CameraActivity.this, text, Toast.LENGTH_LONG).show();
+	        	return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+
+	private void stopAll() {
+		unbindService(mGpsConnection);
+		unbindService(mSensorConnection);
+		
+		stopService(new Intent(context, SensorService.class));
+		stopService(new Intent(context, GpsService.class));
+		finish();
 	}
 
 }

@@ -9,7 +9,7 @@ public class BankOmat {
 	private String bankName;
 	private String bankAddress;
 
-	private TextView displayedView;
+	private TextBean displayedView;
 	private double direction;
 	private double distance;
 
@@ -35,11 +35,11 @@ public class BankOmat {
 		return null;
 	}
 
-	public TextView getDisplayedView() {
+	public TextBean getDisplayedView() {
 		return displayedView;
 	}
 
-	public void setDisplayedView(TextView displayedView) {
+	public void setDisplayedView(TextBean displayedView) {
 		this.displayedView = displayedView;
 	}
 
