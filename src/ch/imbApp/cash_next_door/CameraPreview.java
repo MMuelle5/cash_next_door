@@ -13,12 +13,13 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 //	private int previewSizeWidth;
 //	private int previewSizeHeight;
 	private SurfaceHolder mSurfHolder;
+	private float cameraAngel;
 	
 	public CameraPreview() {
 //		this.previewSizeWidth = previewSizeWidth;
 //		this.previewSizeHeight = previewSizeHeight;
 	}
-
+	
 	public void onPreviewFrame(byte[] arg0, Camera arg1) {
 		// At preview mode, the frame data will push to here.
 		// But we do not want these data.
@@ -32,6 +33,8 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 		   
 		  parameters = mCamera.getParameters();
 
+		  setCameraAngel(parameters.getHorizontalViewAngle());
+		  
 		  // Set the camera preview size
 //		  parameters.setPreviewSize(previewSizeWidth, previewSizeHeight);
 //		  // Set the take picture size, you can set the large size of the camera supported.
@@ -79,5 +82,13 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 	// Set auto-focus interface
 	public void CameraStartAutoFocus() {
 		// TODO
+	}
+
+	public void setCameraAngel(float cameraAngel) {
+		this.cameraAngel = cameraAngel;
+	}
+
+	public float getCameraAngel() {
+		return cameraAngel;
 	}
 }
