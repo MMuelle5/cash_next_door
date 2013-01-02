@@ -3,7 +3,6 @@ package ch.imbApp.cash_next_door;
 import java.io.IOException;
 
 import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.view.SurfaceHolder;
 

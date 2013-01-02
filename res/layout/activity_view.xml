@@ -17,6 +17,7 @@
     android:id="@+id/cashOmat1"
     android:maxLines="2"
     android:layout_marginTop="60dp"
+    android:textColorHighlight="#eeeeee"
      />
 
 <TextView

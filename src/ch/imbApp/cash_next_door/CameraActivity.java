@@ -60,7 +60,6 @@ public class CameraActivity extends Activity {
 	final Messenger mGpsMessenger = new Messenger(new IncomingGpsHandler());
 	final Messenger mSensorMessenger = new Messenger(new IncomingSensorHandler());
 	private double myDirection;
-	private double cameraAngle;
 	
 	private AutomatenLoader loader = new AutomatenLoader();
 	private Thread thread;
@@ -75,7 +74,6 @@ public class CameraActivity extends Activity {
 		SurfaceHolder camHolder = camView.getHolder();
 		camPreview = new CameraPreview();
 		camHolder.addCallback(camPreview);
-		cameraAngle = camPreview.getCameraAngel();
 		mainLayout = (FrameLayout) findViewById(R.id.camera_preview);
 		mainLayout.addView(camView, new LayoutParams());
 
@@ -295,9 +293,9 @@ public class CameraActivity extends Activity {
 	 */
 	private void pointText(BankOmat machine) {
 		double totDir = machine.getDirection() - myDirection;
-		double widthPerDegree = xWith / cameraAngle;
+		double widthPerDegree = xWith / camPreview.getCameraAngel();
 
-		if (totDir < cameraAngle / 2 && totDir > cameraAngle / -2) {
+		if (totDir < camPreview.getCameraAngel() / 2 && totDir > camPreview.getCameraAngel() / -2) {
 			TextView bankOmat;
 			if(machine.getDisplayedView() != null) {
 				bankOmat = machine.getDisplayedView();
