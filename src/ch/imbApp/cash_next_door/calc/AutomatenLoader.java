@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.net.ssl.HttpsURLConnection;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +31,7 @@ public class AutomatenLoader implements Runnable {
 			URL requestUrl = new URL(url);
 			URLConnection connection = requestUrl.openConnection();
 				
-		   BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		   BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "ISO-8859-1"));
 	 
 		   String inputLine;
 	 
@@ -41,7 +39,7 @@ public class AutomatenLoader implements Runnable {
 		      myContent.append(inputLine);
 		   }
 		   br.close();
-			
+
 		   jsonObject = new JSONObject(myContent.toString());
 
 		} catch (MalformedURLException e) {
