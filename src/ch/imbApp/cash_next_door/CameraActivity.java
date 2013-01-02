@@ -11,6 +11,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationManager;
@@ -296,10 +297,13 @@ public class CameraActivity extends Activity {
 		double totDir = machine.getDirection() - myDirection;
 		double widthPerDegree = xWith / cameraAngle;
 
-		if (totDir < cameraAngle / 2 && totDir > cameraAngle / -2 && unusedTextList.size() > 0) {
+		if (totDir < cameraAngle / 2 && totDir > cameraAngle / -2) {
 			TextView bankOmat;
 			if(machine.getDisplayedView() != null) {
 				bankOmat = machine.getDisplayedView();
+			}
+			else if(unusedTextList.size() == 0) {
+				return;
 			}
 			else {
 				bankOmat = unusedTextList.get(0);
@@ -310,19 +314,15 @@ public class CameraActivity extends Activity {
 			bankOmat.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m");
 			
 			MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
-
-//			if(totDir < 0) {
-//				params.leftMargin = (int) (widthPerDegree * totDir * -1);
-//			}
-//			else {
-				params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
-//			}
+			params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
+			
 				
-			System.out.println("widthPerDegree: "+widthPerDegree+" margin: " +params.leftMargin+" totDir: "+totDir);
 			bankOmat.setLayoutParams(params);
+			bankOmat.setBackgroundColor(Color.GREEN);
 		}
 		else if(machine.getDisplayedView() != null){
 			machine.getDisplayedView().setText("");
+			machine.getDisplayedView().setBackgroundColor(Color.TRANSPARENT);
 			unusedTextList.add(machine.getDisplayedView());
 			machine.setDisplayedView(null);
 		}
