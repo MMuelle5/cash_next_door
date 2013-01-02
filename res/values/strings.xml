@@ -3,7 +3,7 @@
     <string name="app_name">cash_next_door</string>
     <string name="hello">Kuuuk</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Cash next door</string>
 	<string name="woBinIch">Suech mich</string>
 	<string name="longitude">Längengrad: </string>
 	<string name="latitude">Breitengrad: </string>
