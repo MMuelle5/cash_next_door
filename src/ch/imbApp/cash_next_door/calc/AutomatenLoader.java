@@ -2,7 +2,6 @@ package ch.imbApp.cash_next_door.calc;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,6 +9,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,32 +26,23 @@ public class AutomatenLoader implements Runnable {
 	public double latitude;
 
 	public static JSONObject makeHttpJsonRequest(String url) {
-		String myContent = "";
+		StringBuilder myContent = new StringBuilder();
 		JSONObject jsonObject = null;
 
 		try {
 			URL requestUrl = new URL(url);
 			URLConnection connection = requestUrl.openConnection();
-			InputStream input = connection.getInputStream();
-			int len = connection.getContentLength();
-
-			if (len > 0) {
-				BufferedReader streamReader = new BufferedReader(
-						new InputStreamReader(input, "UTF-8"));
-				StringBuilder responseStrBuilder = new StringBuilder();
-
-				String inputStr;
-				while ((inputStr = streamReader.readLine()) != null) {
-					responseStrBuilder.append(inputStr);
-				}
-
-				myContent = responseStrBuilder.toString();
-				input.close();
-			} else {
-				return null;
-			}
-
-			jsonObject = new JSONObject(myContent);
+				
+		   BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	 
+		   String inputLine;
+	 
+		   while ((inputLine = br.readLine()) != null){
+		      myContent.append(inputLine);
+		   }
+		   br.close();
+			
+		   jsonObject = new JSONObject(myContent.toString());
 
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -82,8 +74,8 @@ public class AutomatenLoader implements Runnable {
 		requestUrl += "location=" + location + "&rankby=" + rankby + "&types="
 				+ types + "&sensor=" + sensor + "&key=" + apiKey;
 
-		// JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
-		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
+		 JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
+//		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
 
 		try {
 			JSONArray resultArray = (JSONArray) jsonObject.get("results");
