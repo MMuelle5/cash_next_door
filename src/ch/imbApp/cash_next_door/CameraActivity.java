@@ -60,7 +60,7 @@ public class CameraActivity extends Activity {
 	final Messenger mGpsMessenger = new Messenger(new IncomingGpsHandler());
 	final Messenger mSensorMessenger = new Messenger(new IncomingSensorHandler());
 	private double myDirection;
-	private double cameraAngle = 54.8;
+	private double cameraAngle;
 	
 	private AutomatenLoader loader = new AutomatenLoader();
 	private Thread thread;
@@ -75,6 +75,7 @@ public class CameraActivity extends Activity {
 		SurfaceHolder camHolder = camView.getHolder();
 		camPreview = new CameraPreview();
 		camHolder.addCallback(camPreview);
+		cameraAngle = camPreview.getCameraAngel();
 		mainLayout = (FrameLayout) findViewById(R.id.camera_preview);
 		mainLayout.addView(camView, new LayoutParams());
 
@@ -247,9 +248,8 @@ public class CameraActivity extends Activity {
 				case SensorService.MSG_SET_STRING_VALUE:
 
 					if (msg.getData().getDouble("azimuth") != 0d) {
-						double x = msg.getData().getDouble("azimuth");
-						myDirectionText.setText(myDirection + "°");
-						myDirection = x;
+						myDirection = msg.getData().getDouble("azimuth");
+						myDirectionText.setText("myDirect: "+ myDirection + "°");
 						moved();
 					}
 					break;
