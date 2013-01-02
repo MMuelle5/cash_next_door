@@ -49,7 +49,6 @@ public class CameraActivity extends Activity {
 	private Location myLoc;
 	private Location lastPosLoaded;
 	private List<BankOmat> cashMachines = Collections.synchronizedList(new ArrayList<BankOmat>());
-	private List<BankOmat> visibleCashMachines = Collections.synchronizedList(new ArrayList<BankOmat>());
 	private List<TextView> unusedTextList = Collections.synchronizedList(new ArrayList<TextView>());
 	private int xWith;
 
@@ -133,7 +132,6 @@ public class CameraActivity extends Activity {
 		System.out.println("Load");
 		loader.latitude = myLoc.getLatitude();
 		loader.longitude = myLoc.getLongitude();
-		loader.shownMachines = visibleCashMachines;
 		
 		thread = new Thread(loader);
 		thread.start();
