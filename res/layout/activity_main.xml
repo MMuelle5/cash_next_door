@@ -10,11 +10,7 @@
     android:layout_height="wrap_content" 
     android:text="@string/hello"
     />
-<Button android:text="@string/woBinIch"
-    android:id="@+id/gogoButton"
-    android:onClick="gogogo" 
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" />
+
 
 <Button android:text="cameraButton"
     android:id="@+id/cameraButton"

@@ -10,13 +10,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import ch.imbApp.cash_next_door.service.GpsService;
 
 public class MainActivity extends Activity {
 
 	private static String TAG = "cash-next-door";
 
-	Button gogoButton;
 	Button cameraView;
 	TextView locationText;
 	private Context context;
@@ -36,19 +34,6 @@ public class MainActivity extends Activity {
 	}
 
 	private void addListenerOnGogoButton() {
-
-		gogoButton = (Button) findViewById(R.id.gogoButton);
-
-		gogoButton.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View view) {
-				
-				Intent viewActivity = new Intent(context, ViewActivity.class);
-				startActivity(viewActivity);
-
-			}
-
-		});
 
 		cameraView = (Button) findViewById(R.id.cameraButton);
 		

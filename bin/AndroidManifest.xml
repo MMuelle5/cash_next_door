@@ -31,8 +31,6 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".ViewActivity" />
-        
         <activity android:name=".CameraActivity" />
        
 		<service android:name=".service.GpsService" android:process=":gpsService"></service>
