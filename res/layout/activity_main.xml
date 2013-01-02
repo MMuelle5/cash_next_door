@@ -3,19 +3,16 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    > 
+    android:background="@drawable/screen_home"
+    >
 
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
-
-
-<Button android:text="cameraButton"
+<Button android:text=""
     android:id="@+id/cameraButton"
     android:onClick="gogogo" 
     android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" />
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:visibility="visible"
+    android:alpha="0" />
 
 </LinearLayout>
