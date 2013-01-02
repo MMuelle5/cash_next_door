@@ -8,4 +8,5 @@
 	<string name="longitude">Längengrad: </string>
 	<string name="latitude">Breitengrad: </string>
 	<string name="distance">Distanz zum nächsten Automaten: </string>
+	<string name="beenden">Beenden</string>
 </resources>

@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
+import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -113,27 +114,14 @@ public class GpsService extends Service implements LocationListener {
 		return START_STICKY;
 
 	}
-//	@Override
-//	protected void onHandleIntent(Intent intent) {
-//		this.intent = intent;
-//	
-//	    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-//        
-//        boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-//        System.out.println("enabled"+enabled);
-//		if (!enabled) {
-//		  Intent in = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//		  startActivity(intent);
-//    	}
-//		
-//		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-//
-//	    Criteria criteria = new Criteria();
-//	    String provider = locationManager.getBestProvider(criteria, false);
-//	    Location location = locationManager.getLastKnownLocation(provider);
-//		onLocationChanged(location);
-//
-//	}
+
+	
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		locationManager.removeUpdates(this);
+	}
 
 	@Override
 	public void onCreate() {
@@ -168,15 +156,6 @@ public class GpsService extends Service implements LocationListener {
                 msg.setData(b);
                 mClients.get(i).send(msg);
 
-//                b = new Bundle();
-//                b.putDouble("longitude", longitude);
-//                msg.setData(b);
-//                mClients.get(i).send(msg);
-//
-//                b = new Bundle();
-//                b.putFloat("direction", direction);
-//                msg.setData(b);
-//                mClients.get(i).send(msg);
                 
             } catch (RemoteException e) {
             	e.printStackTrace();

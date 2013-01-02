@@ -41,12 +41,6 @@ public class SensorService extends Service implements SensorEventListener {
 	private double azimuth;
 	private double pitch;
 	private double lastAzimuthUpd;
-	private float[] accels;
-	private float[] mags;
-
-	private float[] gravity = new float[3];
-	private float[] geomag = new float[3];
-	private float[] rotationMatrix = new float[16];
 	
 	static final float ALPHA = 0.8f;
 	
@@ -197,4 +191,13 @@ public class SensorService extends Service implements SensorEventListener {
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
 	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		sensorManager.unregisterListener(this, accelerometer);
+		sensorManager.unregisterListener(this, magnetometer);
+	}
+	
 }

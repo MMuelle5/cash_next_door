@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCallback {
@@ -50,7 +51,7 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 		   
 		  mCamera.setParameters(parameters);
 
-			mCamera.setDisplayOrientation(90);
+		  mCamera.setDisplayOrientation(90);
 		  mCamera.startPreview();
 	}
 
@@ -66,11 +67,6 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 			mCamera.release();
 			mCamera = null;
 		}
-	}
-
-	public void surfaceDestroyed(SurfaceHolder arg0) {
-		mCamera.release();
-		mCamera = null;
 	}
 
 	// Take picture interface
@@ -90,4 +86,15 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 	public float getCameraAngel() {
 		return cameraAngel;
 	}
+
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		Log.i("CameraPreview", "destroy");
+		if(mCamera != null) {
+			mCamera.stopPreview();
+			mCamera.setPreviewCallback(null); 
+			mCamera.release();
+			mCamera = null;
+		}
+	}
+	
 }

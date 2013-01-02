@@ -22,6 +22,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -89,6 +92,37 @@ public class CameraActivity extends Activity {
 		updateMachineList();
 
 	}
+
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.activity_main, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.destroyMe:
+	            stopAll();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+
+	private void stopAll() {
+		unbindService(mGpsConnection);
+		unbindService(mSensorConnection);
+		
+		stopService(new Intent(context, SensorService.class));
+		stopService(new Intent(context, GpsService.class));
+		finish();
+	}
+
 
 	private void doViewActivities() {
 
