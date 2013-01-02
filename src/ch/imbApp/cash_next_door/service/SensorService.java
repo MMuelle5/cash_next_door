@@ -77,9 +77,9 @@ public class SensorService extends Service implements SensorEventListener {
 				.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
 		sensorManager.registerListener(this, accelerometer,
-				SensorManager.SENSOR_DELAY_FASTEST);
+				SensorManager.SENSOR_DELAY_GAME);
 		sensorManager.registerListener(this, magnetometer,
-				SensorManager.SENSOR_DELAY_FASTEST);
+				SensorManager.SENSOR_DELAY_GAME);
 
 		System.out.println("Listeners registred!");
 		return START_STICKY;
@@ -90,8 +90,6 @@ public class SensorService extends Service implements SensorEventListener {
 		// onSensorChanged gets called for each sensor so we have to remember
 		// the values
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			//with lowPass Filter: 
-			//mAccelerometer = lowPass(event.values, mAccelerometer);
 			mAccelerometer = event.values;
 		}
 
@@ -109,7 +107,7 @@ public class SensorService extends Service implements SensorEventListener {
 				//float[] orientation = new float[3];
 
 				float[] rotationMatrix = new float[9];  
-				if(SensorManager.getRotationMatrix(rotationMatrix, null, mAccelerometer, mGeomagnetic)){
+				if(SensorManager.getRotationMatrix(rotationMatrix, mAccelerometer, mAccelerometer, mGeomagnetic)){
 					float[] orientMatrix = new float[3];
 					float[] remapMatrix = new float[9];
 					SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, remapMatrix);
@@ -126,20 +124,6 @@ public class SensorService extends Service implements SensorEventListener {
 			}
 		}
 
-	}
-
-	
-	/**
-	 * @see http://en.wikipedia.org/wiki/Low-pass_filter#Algorithmic_implementation
-	 * @see http://developer.android.com/reference/android/hardware/Sensor.html#TYPE_ACCELEROMETER
-	 */
-	protected float[] lowPass(float[] input, float[] output) {
-		if (output == null) return input;
-
-	    for (int i = 0; i < input.length; i++) {
-	        output[i] = output[i] + ALPHA * (input[i] - output[i]);
-	    }
-	    return output;
 	}
 
 	protected void onPause() {
