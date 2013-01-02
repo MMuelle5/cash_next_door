@@ -307,7 +307,8 @@ public class CameraActivity extends Activity {
 				machine.setDisplayedView(bankOmat);
 			}
 			
-			bankOmat.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m totDir:"+totDir);
+			bankOmat.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m");
+			
 			MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
 
 //			if(totDir < 0) {
@@ -317,7 +318,7 @@ public class CameraActivity extends Activity {
 				params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
 //			}
 				
-//				System.out.println("widthPerDegree: "+widthPerDegree+" margin: " +params.leftMargin+" with: "+params.width);
+			System.out.println("widthPerDegree: "+widthPerDegree+" margin: " +params.leftMargin+" totDir: "+totDir);
 			bankOmat.setLayoutParams(params);
 		}
 		else if(machine.getDisplayedView() != null){
