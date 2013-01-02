@@ -162,7 +162,7 @@ public class GpsService extends Service implements LocationListener {
 
                 //Send values
                 Bundle b = new Bundle();
-                b.putDoubleArray("location", new double[]{longitude, latitude});
+                b.putDoubleArray("location", new double[]{longitude, latitude,direction});
 //                b.putDouble("latitude", latitude);
                 Message msg = Message.obtain(null, MSG_SET_STRING_VALUE);
                 msg.setData(b);

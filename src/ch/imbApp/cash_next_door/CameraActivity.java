@@ -26,7 +26,6 @@ import android.view.SurfaceView;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import ch.imbApp.cash_next_door.alert.Alerts;
@@ -43,19 +42,12 @@ public class CameraActivity extends Activity {
 	private CameraPreview camPreview;
 	private FrameLayout mainLayout;
 
-	//		TextView locationText;
 	private Context context;
-	//		private TextView lat;
-	//		private TextView lon;
-	//		private TextView distance;
-	private TextView angle;
 	private TextView myDirectionText;
-    private ProgressBar mProgress;
-	//		private TextView lonText;
 
 	private Location myLoc;
 	private Location lastPosLoaded;
-	private List<BankOmat> hiddenCashMachines = Collections.synchronizedList(new ArrayList<BankOmat>());
+	private List<BankOmat> cashMachines = Collections.synchronizedList(new ArrayList<BankOmat>());
 	private List<BankOmat> visibleCashMachines = Collections.synchronizedList(new ArrayList<BankOmat>());
 	private List<TextView> unusedTextList = Collections.synchronizedList(new ArrayList<TextView>());
 	private int xWith;
@@ -70,25 +62,13 @@ public class CameraActivity extends Activity {
 	private double cameraAngle = 54.8;
 	
 	private AutomatenLoader loader = new AutomatenLoader();
-	private Thread thread = new Thread(loader);
-
-	//	 private Handler mHandler = new Handler(Looper.getMainLooper());
+	private Thread thread;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		context = this;
 
-		//		setContentView(R.layout.activity_camera);
-		//
-		////		Intent intent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
-		////		Intent intent = new Intent(MediaStore.INTENT_ACTION_VIDEO_CAMERA);
-		//		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		//		startActivity(intent);
-
-		//		  getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  
-		//		  WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		//		  requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_camera);
 		SurfaceView camView = new SurfaceView(this);
 		SurfaceHolder camHolder = camView.getHolder();
@@ -97,7 +77,7 @@ public class CameraActivity extends Activity {
 		mainLayout = (FrameLayout) findViewById(R.id.camera_preview);
 		mainLayout.addView(camView, new LayoutParams());
 
-		//FIXME Kamerawinkel wurde mit parameters.getHorizontalViewAngle()); für mein Phone geholt (54.8%)		  
+		//FIXME Kamerawinkel wurde mit parameters.getHorizontalViewAngle()); für mein Phone geholt (54.8°)		  
 		Display disp = this.getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		disp.getSize(size);
@@ -107,21 +87,14 @@ public class CameraActivity extends Activity {
 
 		doViewActivities();
 		relativeLayoutSensorsData.bringToFront();
-		updateHiddenList();
+		updateMachineList();
 
 	}
 
 	private void doViewActivities() {
-		//		lat = (TextView) findViewById(R.id.latitude);
-		//		lon = (TextView) findViewById(R.id.longitude);
-		//		distance = (TextView) findViewById(R.id.distance);
-		angle = (TextView) findViewById(R.id.angle);
+
 		myDirectionText = (TextView) findViewById(R.id.myDirection);
-//		mProgress = (ProgressBar) findViewById(R.id.lin_progress_bar);
-		//		lonText = (TextView) findViewById(R.id.longitudeText);
-		unusedTextList.add((TextView) findViewById(R.id.cashOmat1));
-		unusedTextList.add((TextView) findViewById(R.id.cashOmat2));
-		unusedTextList.add((TextView) findViewById(R.id.cashOmat3));
+		initUnusedTextFields();
 
 		Alerts.init(context);
 
@@ -132,9 +105,38 @@ public class CameraActivity extends Activity {
 		doBindService();
 	}
 
-	private void updateHiddenList() {    
+	/**
+	 * setzt die Textfelder zurück
+	 */
+	private void initUnusedTextFields() {
 		
-		thread.start();   
+		unusedTextList = new ArrayList<TextView>();
+		unusedTextList.add((TextView) findViewById(R.id.cashOmat1));
+		unusedTextList.add((TextView) findViewById(R.id.cashOmat2));
+		unusedTextList.add((TextView) findViewById(R.id.cashOmat3));
+		
+		for(TextView tv : unusedTextList) {
+			tv.setText("");
+		}
+		
+	}
+
+	/**
+	 * holt die Records von google
+	 */
+	private void updateMachineList() {    
+		
+		if(myLoc == null) {
+			return;
+		}
+		
+		System.out.println("Load");
+		loader.latitude = myLoc.getLatitude();
+		loader.longitude = myLoc.getLongitude();
+		loader.shownMachines = visibleCashMachines;
+		
+		thread = new Thread(loader);
+		thread.start();
 		
 		ProgressDialog pd = ProgressDialog.show(context, "Bitte warten...", "Daten werden aktualisiert", true, false);
     
@@ -147,7 +149,9 @@ public class CameraActivity extends Activity {
 	
 		}
 	
-		hiddenCashMachines = loader.machineList;
+		cashMachines = loader.machineList;
+		initUnusedTextFields();
+
 		pd.dismiss();
 		
 	}
@@ -209,7 +213,6 @@ public class CameraActivity extends Activity {
 					double[] loc = msg.getData().getDoubleArray("location");
 					myLoc.setLongitude(loc[0]);
 					myLoc.setLatitude(loc[1]);
-
 					break;
 				default:
 					super.handleMessage(msg);
@@ -222,8 +225,9 @@ public class CameraActivity extends Activity {
 			if (lastPosLoaded == null ){
 				lastPosLoaded = new Location("LAST");
 			}
-			else if (lastPosLoaded.distanceTo(myLoc) > 20) { //nur alle 20 m?
-				updateHiddenList();
+
+			if (lastPosLoaded.distanceTo(myLoc) > 20) { //nur alle 20 m?
+				updateMachineList();
 				lastPosLoaded.setLatitude(myLoc.getLatitude());
 				lastPosLoaded.setLongitude(myLoc.getLongitude());
 			}
@@ -270,61 +274,16 @@ public class CameraActivity extends Activity {
 
 		if (timer.isTimeReached()) {
 			
-			if (visibleCashMachines != null && visibleCashMachines.size() > 0) {
-				for (int i = visibleCashMachines.size() - 1; i >= 0; i--) {
-					//		        for(BankOmat machine: visibleCashMachines) {
+			if (cashMachines != null && cashMachines.size() > 0) {
+				for (BankOmat machine : cashMachines) {
 
-					//		        	machine.setDirection(CalcAngle.calcAngle(myDirection, myLoc, machine.getLocation()));
-					BankOmat machine = visibleCashMachines.get(i);
-					CalcAngle.uptDateBankOmatInfos(myLoc, machine);
-
-					pointTextAlreadyDisplayed(machine);
-					angle.setText(machine.getDirection() + "°");
-
-				}
-			}
-			if (hiddenCashMachines != null && hiddenCashMachines.size() > 0) {
-				for (int i = hiddenCashMachines.size() - 1; i >= 0; i--) {
-					//		        for(BankOmat machine: hiddenCashMachines) {
-					//	        	distance.setText(myLoc.distanceTo(machine.getLocation())+" Meter");
-					//		        	machine.setDirection(CalcAngle.calcAngle(myDirection, myLoc, machine.getLocation()));
-					BankOmat machine = hiddenCashMachines.get(i);
 					CalcAngle.uptDateBankOmatInfos(myLoc, machine);
 
 					pointText(machine);
-					angle.setText(machine.getDirection() + "°");
 
 				}
 			}
 		}
-	}
-
-	/**
-	 * Position der verfuegbaren View wird angepasst ist der Bankomat nicht mehr sichtbar, wird der
-	 * Record zu den unsichtbaren gelegt und die TextView wieder freigegeben.
-	 * 
-	 * @param machine
-	 */
-	private void pointTextAlreadyDisplayed(BankOmat machine) {
-		double totDir = machine.getDirection() - myDirection;//myLoc.getBearing();
-System.out.println(totDir +" "+ cameraAngle / 2);
-		if (totDir < cameraAngle / 2 && totDir > cameraAngle / -2) {
-			//    		int width = (int) (xWith /54.8);
-			//    		TextView bankOmat = machine.getDisplayedView();
-			//    		
-			//    		MarginLayoutParams params=(MarginLayoutParams )bankOmat.getLayoutParams();
-			//    		params.leftMargin = (int) (width*totDir+xWith/2);
-			//    		bankOmat.setLayoutParams(params);
-			displayText(machine, machine.getDisplayedView(), totDir);
-		}
-		else {
-			machine.getDisplayedView().setText("");
-			unusedTextList.add(machine.getDisplayedView());
-			machine.setDisplayedView(null);
-			hiddenCashMachines.add(machine);
-			visibleCashMachines.remove(machine);
-		}
-
 	}
 
 	/**
@@ -335,28 +294,37 @@ System.out.println(totDir +" "+ cameraAngle / 2);
 	 */
 	private void pointText(BankOmat machine) {
 		double totDir = machine.getDirection() - myDirection;
+		double widthPerDegree = xWith / cameraAngle;
 
 		if (totDir < cameraAngle / 2 && totDir > cameraAngle / -2 && unusedTextList.size() > 0) {
-			TextView bankOmat = unusedTextList.get(0);
-			displayText(machine, bankOmat, totDir);
-			machine.setDisplayedView(bankOmat);
-			unusedTextList.remove(bankOmat);
-			visibleCashMachines.add(machine);
-			hiddenCashMachines.remove(machine);
+			TextView bankOmat;
+			if(machine.getDisplayedView() != null) {
+				bankOmat = machine.getDisplayedView();
+			}
+			else {
+				bankOmat = unusedTextList.get(0);
+				unusedTextList.remove(bankOmat);
+				machine.setDisplayedView(bankOmat);
+			}
+			
+			bankOmat.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m totDir:"+totDir);
+			MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
+
+//			if(totDir < 0) {
+//				params.leftMargin = (int) (widthPerDegree * totDir * -1);
+//			}
+//			else {
+				params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
+//			}
+				
+//				System.out.println("widthPerDegree: "+widthPerDegree+" margin: " +params.leftMargin+" with: "+params.width);
+			bankOmat.setLayoutParams(params);
+		}
+		else if(machine.getDisplayedView() != null){
+			machine.getDisplayedView().setText("");
+			unusedTextList.add(machine.getDisplayedView());
+			machine.setDisplayedView(null);
 		}
 	}
 
-	private void displayText(BankOmat machine, TextView bankOmat, double totDir) {
-		int widthPerDegree = (int) (xWith / 54.8);
-		bankOmat.setText(machine.getBankName() + "\n" + machine.getDistance());
-		MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
-
-		if(totDir < 0) {
-			params.leftMargin = (int) (widthPerDegree * totDir * -1);
-		}
-		else {
-			params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
-		}
-		bankOmat.setLayoutParams(params);
-	}
 }

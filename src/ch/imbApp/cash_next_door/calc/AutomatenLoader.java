@@ -19,6 +19,9 @@ import ch.imbApp.cash_next_door.bean.BankOmat;
 public class AutomatenLoader implements Runnable{
 
 	public List<BankOmat> machineList = new ArrayList<BankOmat>();
+	public double longitude;
+	public double latitude;
+	public List<BankOmat> shownMachines = new ArrayList<BankOmat>();
 	
 	
 	@Deprecated
@@ -172,13 +175,10 @@ public class AutomatenLoader implements Runnable{
 			jsonObject = new JSONObject(myContent);
 			
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -197,7 +197,7 @@ public class AutomatenLoader implements Runnable{
 		machineList = new ArrayList<BankOmat>();
 
 		String requestUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?";
-		//String location = loc.getLatitude() + "," + loc.getLongitude();
+//		String location = latitude + "," + longitude;
 		String location = "47.392132,8.518366";
 		String rankby = "distance";
 		String types = "atm";
@@ -245,11 +245,23 @@ public class AutomatenLoader implements Runnable{
 		            }
 		        }
 		        
-		        machineList.add(machine);
+		        boolean isShown = false;
+		        for(BankOmat shown : shownMachines) {
+		        	if(shown.getLocation().distanceTo(machine.getLocation()) == 0 && shown.getBankName().equals(machine.getBankName())) {
+		        		isShown = true;
+		        		break;
+		        	}
+		        }
+		        
+		        if(!isShown) {
+		        	machineList.add(machine);
+		        }
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println(machineList.size());
 	}
 	
 }
