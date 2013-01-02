@@ -77,14 +77,14 @@ public class SensorService extends Service implements SensorEventListener {
 				.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
 		sensorManager.registerListener(this, accelerometer,
-				SensorManager.SENSOR_DELAY_GAME);
+				SensorManager.SENSOR_DELAY_FASTEST);
 		sensorManager.registerListener(this, magnetometer,
-				SensorManager.SENSOR_DELAY_GAME);
+				SensorManager.SENSOR_DELAY_FASTEST);
 
 		System.out.println("Listeners registred!");
 		return START_STICKY;
 	}
-
+	
 	public void onSensorChanged(SensorEvent event) {
 
 		// onSensorChanged gets called for each sensor so we have to remember
@@ -106,13 +106,22 @@ public class SensorService extends Service implements SensorEventListener {
 					mAccelerometer, mGeomagnetic);
 
 			if (success) {
-				float orientation[] = new float[3];
-				SensorManager.getOrientation(R, orientation);
-				// at this point, orientation contains the azimuth(direction),
-				// pitch and roll values.
-				azimuth = 180 * orientation[0] / Math.PI;
-				pitch = 180 * orientation[1] / Math.PI;
-				roll = 180 * orientation[2] / Math.PI;
+				//float[] orientation = new float[3];
+
+				float[] rotationMatrix = new float[9];  
+				if(SensorManager.getRotationMatrix(rotationMatrix, null, mAccelerometer, mGeomagnetic)){
+					float[] orientMatrix = new float[3];
+					float[] remapMatrix = new float[9];
+					SensorManager.remapCoordinateSystem(rotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, remapMatrix);
+					SensorManager.getOrientation(remapMatrix, orientMatrix);
+	
+					// at this point, orientation contains the azimuth(direction),
+					// pitch and roll values.
+					azimuth = orientMatrix[0] * 180 / Math.PI;
+					pitch = orientMatrix[0] * 180 / Math.PI;
+					roll = orientMatrix[0] * 180 / Math.PI;
+				}
+
 				sendMessageToUI();
 			}
 		}
@@ -132,19 +141,6 @@ public class SensorService extends Service implements SensorEventListener {
 	    }
 	    return output;
 	}
-	
-	
-	private void getAccelerometer(SensorEvent event) {
-		float[] values = event.values;
-		// Movement
-		float x = values[0];
-		float y = values[1];
-		float z = values[2];
-
-		isHorizontal = y > -115 && y < -50;
-
-		sendMessageToUI();
-	}
 
 	protected void onPause() {
 
@@ -157,6 +153,7 @@ public class SensorService extends Service implements SensorEventListener {
 		if (mClient != null && timer.isTimeReached()) {
 			Bundle b = new Bundle();
 			isHorizontal = pitch > -115 && pitch < -50;
+			isHorizontal = true;
 			if (isExceptionPopupVisible && isHorizontal) {
 				b.putBoolean(POPUP_FIELD, false);
 				isExceptionPopupVisible = false;
