@@ -36,13 +36,11 @@ import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.imbApp.cash_next_door.alert.Alerts;
 import ch.imbApp.cash_next_door.bean.BankOmat;
-import ch.imbApp.cash_next_door.bean.TextBean;
 import ch.imbApp.cash_next_door.calc.AutomatenLoader;
 import ch.imbApp.cash_next_door.calc.CalcAngle;
 import ch.imbApp.cash_next_door.helper.Timer;
@@ -123,13 +121,9 @@ public class CameraActivity extends Activity {
 		
 		unusedTextList = new ArrayList<TextView>();
 		unusedTextList.add((TextView) findViewById(R.id.cashOmat1));
-		unusedTextList = new ArrayList<TextView>();
 		unusedTextList.add((TextView) findViewById(R.id.cashOmat2));		
-		unusedTextList = new ArrayList<TextView>();
 		unusedTextList.add((TextView) findViewById(R.id.cashOmat3));		
-		unusedTextList = new ArrayList<TextView>();
 		unusedTextList.add((TextView) findViewById(R.id.cashOmat4));		
-		unusedTextList = new ArrayList<TextView>();
 		unusedTextList.add((TextView) findViewById(R.id.cashOmat5));
 		
 		for(TextView textView : unusedTextList) {
