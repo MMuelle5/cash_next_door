@@ -23,8 +23,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,6 +52,8 @@ public class CameraActivity extends Activity {
 	private Context context;
 	private CameraPreview camPreview;
 	private FrameLayout mainLayout;
+	
+	private TextView machineListInfos;
 
 	private Location myLoc;
 	private Location lastPosLoaded;
@@ -84,6 +84,8 @@ public class CameraActivity extends Activity {
 		camHolder.addCallback(camPreview);
 		mainLayout = (FrameLayout) findViewById(R.id.camera_preview);
 		mainLayout.addView(camView, new LayoutParams());
+		
+		machineListInfos = (TextView) findViewById(R.id.machineListInfos);
 	  
 		Display disp = this.getWindowManager().getDefaultDisplay();
 		Point size = new Point();
@@ -144,6 +146,7 @@ public class CameraActivity extends Activity {
 		
 		if(myLoc == null) {
             Toast.makeText(CameraActivity.this, R.string.locationWarning, Toast.LENGTH_SHORT).show();
+            machineListInfos.setVisibility(View.GONE);
 			return;
 		}
 		
@@ -166,6 +169,32 @@ public class CameraActivity extends Activity {
 		}
 	
 		cashMachines = loader.machineList;
+		int maxDistanceToPrefered = 0;
+		int maxDistanceToOthers = 0;
+		for(int i = 0; i<cashMachines.size(); i++) {
+			int actDistance = (int) myLoc.distanceTo(cashMachines.get(i).getLocation());
+			if(i<loader.preferedListSize) {
+				if(maxDistanceToPrefered < actDistance) {
+					maxDistanceToPrefered = actDistance;
+				}
+			}
+			else if(maxDistanceToOthers < actDistance) {
+				maxDistanceToOthers = actDistance;
+			}
+		}
+		String text;
+		if(loader.preferedMachine != null) {
+			text = loader.preferedListSize +" "+ getResources().getString(R.string.countPreferedMachines) +" "+ maxDistanceToPrefered+"m\n"
+					+loader.othersListSize+" "+getResources().getString(R.string.countOthersMachines)+" "+ maxDistanceToOthers+" m";
+		}
+		else {
+			text = loader.othersListSize +" "+ getResources().getString(R.string.countMachines) +" "+ maxDistanceToOthers+"m";
+		}
+		machineListInfos.setText(text);
+		machineListInfos.setVisibility(View.VISIBLE);
+		
+		System.out.println(machineListInfos.getText());
+		
 		initUnusedTextFields();
 
 		pd.dismiss();
@@ -386,12 +415,14 @@ public class CameraActivity extends Activity {
 	        default:
 	        	String title = (String) item.getTitle();
 	        	System.out.println(title);
-	        	if(title != null && title.equals(R.string.all)) {
+	        	if(title != null && title.equals(getResources().getString(R.string.all))) {
 	        		loader.preferedMachine = null;
+	        		Toast.makeText(CameraActivity.this, R.string.machinesUpdate, Toast.LENGTH_SHORT).show();
 	        		updateMachineList();
 	        	}
 	        	else if(title != null) {
 	        		loader.preferedMachine = title;
+	        		Toast.makeText(CameraActivity.this, R.string.machinesUpdate, Toast.LENGTH_SHORT).show();
 	        		updateMachineList();
 	        	}
 	            return super.onOptionsItemSelected(item);
@@ -412,32 +443,6 @@ public class CameraActivity extends Activity {
 	        item.getSubMenu().add(name); 
 		}
 	}
-	
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-
-		Map<String, String> types = new HashMap<String, String>();
-		
-		for(BankOmat machine : loader.completeMachineList) {
-			if(types.get(machine.getBankName()) == null) {
-				types.put(machine.getBankName(), "ok");
-			}
-		}
-
-        menu.setHeaderTitle(R.string.prefered);  
-		for(String name : types.keySet()) {
-	        menu.add(0, v.getId(), 0, name); 
-		}
-	}
-	
-	@Override
-	 public boolean onContextItemSelected(MenuItem item) {  
-		loader.preferedMachine = String.valueOf(item.getTitle());
-		updateMachineList();
-		return true;
-	 }
-
 
 	private void stopAll() {
 		unbindService(mGpsConnection);

@@ -12,6 +12,10 @@
 	<string name="info">Info</string>
 	<string name="locationWarning">Ihr Standort konnte noch nicht ermittelt werden.\nBitte haben Sie etwas Geduld.</string>
 	<string name="machinesUpdated">Die Liste der Bankomaten wurde aktualisiert</string>
+	<string name="machinesUpdate">Die Liste der Bankomaten wird aktualisiert</string>
 	<string name="prefered">Bevorzugte Bankomaten</string>
 	<string name="all">Alle</string>
+	<string name="countPreferedMachines">der bevorzugten Bankomate befinden sich im Umkreis von ca.</string>
+	<string name="countOthersMachines">der restlichen Bankomate befinden sich im Umkreis von ca.</string>
+	<string name="countMachines">Bankomate befinden sich im Umkreis von ca.</string>
 </resources>

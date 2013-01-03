@@ -7,7 +7,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,6 +24,8 @@ public class AutomatenLoader implements Runnable {
 	public double longitude;
 	public double latitude;
 	public String preferedMachine;
+	public int preferedListSize;
+	public int othersListSize;
 
 	public static JSONObject makeHttpJsonRequest(String url) {
 		StringBuilder myContent = new StringBuilder();
@@ -113,14 +114,27 @@ public class AutomatenLoader implements Runnable {
 			e.printStackTrace();
 		}
 
+		preferedListSize = 0;
+		othersListSize = 0;
+		
 		if(preferedMachine != null) {
 			for(BankOmat mach : completeMachineList) {
-				machineList.add(mach);
+				if(preferedMachine.equals(mach.getBankName())) {
+					machineList.add(mach);
+					preferedListSize ++;
+				}
 			}
 		}
 		
-		for(int i = 0; i < completeMachineList.size() && i < 6; i++) {
-			machineList.add(completeMachineList.get(i));
+		int added = 6;
+		for(int i = 0; i < completeMachineList.size() && i < added; i++) {
+			if(preferedMachine == null || !preferedMachine.equals(completeMachineList.get(i).getBankName())) {
+				machineList.add(completeMachineList.get(i));
+				othersListSize ++;
+			}
+			else {
+				added++;
+			}
 		}
 		
 	}

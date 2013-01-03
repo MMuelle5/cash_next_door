@@ -26,5 +26,5 @@
     <include
         android:id="@+id/view_layout"
         layout="@layout/activity_view" />
-    
+
 </FrameLayout>
