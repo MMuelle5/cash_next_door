@@ -127,7 +127,10 @@ public class AutomatenLoader implements Runnable {
 		}
 		
 		for(BankOmat machine : completeMachineList) {
-			if(preferedMachine == null || !preferedMachine.equals(machine)) {
+			if(othersListSize >=6) {
+				break;
+			}
+			if(preferedMachine == null || !preferedMachine.equals(machine.getBankName())) {
 				machineList.add(machine);
 				othersListSize ++;
 			}
