@@ -10,14 +10,11 @@ import android.view.SurfaceHolder;
 public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCallback {
 	
 	private Camera mCamera;
-//	private int previewSizeWidth;
-//	private int previewSizeHeight;
-	private SurfaceHolder mSurfHolder;
+
 	private float cameraAngel;
 	
 	public CameraPreview() {
-//		this.previewSizeWidth = previewSizeWidth;
-//		this.previewSizeHeight = previewSizeHeight;
+
 	}
 	
 	public void onPreviewFrame(byte[] arg0, Camera arg1) {
@@ -28,17 +25,9 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 	public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
 
 		  Parameters parameters;
-		  mSurfHolder = arg0;
-		  
-		   
 		  parameters = mCamera.getParameters();
 
 		  setCameraAngel(parameters.getHorizontalViewAngle());
-		  
-		  // Set the camera preview size
-//		  parameters.setPreviewSize(previewSizeWidth, previewSizeHeight);
-//		  // Set the take picture size, you can set the large size of the camera supported.
-//		  parameters.setPictureSize(previewSizeWidth, previewSizeHeight);
 		   
 		  // Turn on the camera flash. 
 		  String NowFlashMode = parameters.getFlashMode();
@@ -71,12 +60,10 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
 
 	// Take picture interface
 	public void CameraTakePicture(String FileName) {
-		// TODO
 	}
 
 	// Set auto-focus interface
 	public void CameraStartAutoFocus() {
-		// TODO
 	}
 
 	public void setCameraAngel(float cameraAngel) {

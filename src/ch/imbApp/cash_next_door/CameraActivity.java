@@ -51,11 +51,10 @@ import ch.imbApp.cash_next_door.service.SensorService;
 @TargetApi(13)
 public class CameraActivity extends Activity {
 
+	private Context context;
 	private CameraPreview camPreview;
 	private FrameLayout mainLayout;
 
-	private Context context;
-	private TextView myDirectionText;
 
 	private Location myLoc;
 	private Location lastPosLoaded;
@@ -86,8 +85,7 @@ public class CameraActivity extends Activity {
 		camHolder.addCallback(camPreview);
 		mainLayout = (FrameLayout) findViewById(R.id.camera_preview);
 		mainLayout.addView(camView, new LayoutParams());
-
-		//FIXME Kamerawinkel wurde mit parameters.getHorizontalViewAngle()); für mein Phone geholt (54.8°)		  
+	  
 		Display disp = this.getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		disp.getSize(size);
@@ -102,8 +100,7 @@ public class CameraActivity extends Activity {
 	}
 
 	private void doViewActivities() {
-
-		myDirectionText = (TextView) findViewById(R.id.myDirection);
+		
 		initUnusedTextFields();
 
 		Alerts.init(context);
@@ -269,7 +266,6 @@ public class CameraActivity extends Activity {
 
 					if (msg.getData().getDouble("azimuth") != 0d) {
 						myDirection = msg.getData().getDouble("azimuth");
-						myDirectionText.setText("myDirect: "+ myDirection + "°");
 						moved();
 					}
 					break;

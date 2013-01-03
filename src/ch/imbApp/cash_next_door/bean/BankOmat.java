@@ -1,7 +1,6 @@
 package ch.imbApp.cash_next_door.bean;
 
 import android.location.Location;
-import android.widget.TextView;
 
 public class BankOmat {
 

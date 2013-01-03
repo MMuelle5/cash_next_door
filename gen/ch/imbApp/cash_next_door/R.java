@@ -22,14 +22,13 @@ public final class R {
         public static final int cashOmat1=0x7f070007;
         public static final int cashOmat2=0x7f070008;
         public static final int cashOmat3=0x7f070009;
-        public static final int destroyMe=0x7f07000d;
+        public static final int destroyMe=0x7f07000c;
         public static final int frameLayout2=0x7f070003;
         public static final int imageView1=0x7f070004;
         public static final int imageView2=0x7f070005;
         public static final int imageView3=0x7f070006;
-        public static final int info=0x7f07000c;
-        public static final int myDirection=0x7f07000a;
-        public static final int preferedMachine=0x7f07000b;
+        public static final int info=0x7f07000b;
+        public static final int preferedMachine=0x7f07000a;
         public static final int view_layout=0x7f070001;
     }
     public static final class layout {
