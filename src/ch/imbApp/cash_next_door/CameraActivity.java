@@ -138,11 +138,12 @@ public class CameraActivity extends Activity {
 	private void updateMachineList() {    
 		
 		if(myLoc == null) {
-            Toast.makeText(CameraActivity.this, R.string.locationWarning, Toast.LENGTH_SHORT).show();
+            Toast.makeText(CameraActivity.this, R.string.locationWarning, Toast.LENGTH_LONG).show();
             machineListInfos.setVisibility(View.GONE);
 			return;
 		}
-		
+
+		Toast.makeText(CameraActivity.this, R.string.machinesUpdate, Toast.LENGTH_SHORT).show();
 		System.out.println("Load");
 		loader.latitude = myLoc.getLatitude();
 		loader.longitude = myLoc.getLongitude();
@@ -150,8 +151,6 @@ public class CameraActivity extends Activity {
 		thread = new Thread(loader);
 		thread.start();
 		
-		ProgressDialog pd = ProgressDialog.show(context, "Bitte warten...", "Daten werden aktualisiert", true, false);
-    
 		while(loader.machineList == null || loader.machineList.size() ==0) {
 	        try {
 				Thread.sleep(100);
@@ -189,10 +188,8 @@ public class CameraActivity extends Activity {
 		System.out.println(machineListInfos.getText());
 		
 		initUnusedTextFields();
-
-		pd.dismiss();
 		
-        Toast.makeText(CameraActivity.this, R.string.machinesUpdated, Toast.LENGTH_SHORT).show();
+        Toast.makeText(CameraActivity.this, R.string.machinesUpdated, Toast.LENGTH_LONG).show();
 		
 	}
 
@@ -410,12 +407,10 @@ public class CameraActivity extends Activity {
 	        	System.out.println(title);
 	        	if(title != null && title.equals(getResources().getString(R.string.all))) {
 	        		loader.preferedMachine = null;
-	        		Toast.makeText(CameraActivity.this, R.string.machinesUpdate, Toast.LENGTH_SHORT).show();
 	        		updateMachineList();
 	        	}
 	        	else if(title != null) {
 	        		loader.preferedMachine = title;
-	        		Toast.makeText(CameraActivity.this, R.string.machinesUpdate, Toast.LENGTH_SHORT).show();
 	        		updateMachineList();
 	        	}
 	            return super.onOptionsItemSelected(item);
