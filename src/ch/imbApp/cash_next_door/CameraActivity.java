@@ -15,7 +15,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -267,7 +266,7 @@ public class CameraActivity extends Activity {
 				lastPosLoaded = new Location("LAST");
 			}
 
-			if (lastPosLoaded.distanceTo(myLoc) > 20) { //nur alle 20 m?
+			if (lastPosLoaded.distanceTo(myLoc) > 30) { //nur alle 30m aktualisieren
 				updateMachineList();
 				lastPosLoaded.setLatitude(myLoc.getLatitude());
 				lastPosLoaded.setLongitude(myLoc.getLongitude());
@@ -377,7 +376,7 @@ public class CameraActivity extends Activity {
 		bankOmat.setText(text);
 		
 		MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
-		params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2 + 20);
+		params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
 		bankOmat.setLayoutParams(params);
 		bankOmat.setBackgroundResource(R.drawable.bg_shape);
 	}

@@ -72,8 +72,8 @@ public class AutomatenLoader implements Runnable {
 		requestUrl += "location=" + location + "&rankby=" + rankby + "&types="
 				+ types + "&sensor=" + sensor + "&key=" + apiKey;
 
-		//JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
-		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
+		JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
+//		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
 
 		try {
 			JSONArray resultArray = (JSONArray) jsonObject.get("results");
@@ -126,14 +126,10 @@ public class AutomatenLoader implements Runnable {
 			}
 		}
 		
-		int added = 6;
-		for(int i = 0; i < completeMachineList.size() && i < added; i++) {
-			if(preferedMachine == null || !preferedMachine.equals(completeMachineList.get(i).getBankName())) {
-				machineList.add(completeMachineList.get(i));
+		for(BankOmat machine : completeMachineList) {
+			if(preferedMachine == null || !preferedMachine.equals(machine)) {
+				machineList.add(machine);
 				othersListSize ++;
-			}
-			else {
-				added++;
 			}
 		}
 		
