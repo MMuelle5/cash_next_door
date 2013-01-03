@@ -16,45 +16,48 @@
     android:layout_height="wrap_content" 
     android:id="@+id/cashOmat1"
     android:maxLines="4"
-    android:layout_marginTop="60dp"
+    android:layout_marginTop="20dp"
     android:padding="5dp"
-    android:layout_toRightOf="@+id/imageView1"
      />
 
 <TextView
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
     android:id="@+id/cashOmat2"
-    android:layout_marginTop="120dp"
     android:maxLines="4"
     android:padding="5dp"
+    android:layout_marginTop="5dp"
+    android:layout_below="@+id/cashOmat1"
     />
 
 <TextView
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
     android:id="@+id/cashOmat3"
-    android:layout_marginTop="180dp"
     android:maxLines="4"
     android:padding="5dp"
+    android:layout_marginTop="5dp"
+    android:layout_below="@+id/cashOmat2"
      />
 
 <TextView
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
     android:id="@+id/cashOmat4"
-    android:layout_marginTop="240dp"
     android:maxLines="4"
     android:padding="5dp"
+    android:layout_marginTop="5dp"
+    android:layout_below="@+id/cashOmat3"
      />
 
 <TextView
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
     android:id="@+id/cashOmat5"
-    android:layout_marginTop="300dp"
     android:maxLines="4"
     android:padding="5dp"
+    android:layout_marginTop="5dp"
+    android:layout_below="@+id/cashOmat4"
      />
 
 <TextView
