@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -23,6 +24,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,7 +61,7 @@ public class CameraActivity extends Activity {
 	private Location myLoc;
 	private Location lastPosLoaded;
 	private List<BankOmat> cashMachines = Collections.synchronizedList(new ArrayList<BankOmat>());
-	private List<TextBean> unusedTextList = Collections.synchronizedList(new ArrayList<TextBean>());
+	private List<TextView> unusedTextList = Collections.synchronizedList(new ArrayList<TextView>());
 	private int xWith;
 
 	private Timer timer = new Timer(100);
@@ -118,22 +121,19 @@ public class CameraActivity extends Activity {
 	 */
 	private void initUnusedTextFields() {
 		
-		unusedTextList = new ArrayList<TextBean>();
-		TextBean tb = new TextBean();
-		tb.text = (TextView) findViewById(R.id.cashOmat1);
-		tb.img = (ImageView) findViewById(R.id.imageView1);
-		unusedTextList.add(tb);
-		tb = new TextBean();
-		tb.text = (TextView) findViewById(R.id.cashOmat2);
-		tb.img = (ImageView) findViewById(R.id.imageView2);
-		unusedTextList.add(tb);
-		tb = new TextBean();
-		tb.text = (TextView) findViewById(R.id.cashOmat3);
-		tb.img = (ImageView) findViewById(R.id.imageView3);
-		unusedTextList.add(tb);
+		unusedTextList = new ArrayList<TextView>();
+		unusedTextList.add((TextView) findViewById(R.id.cashOmat1));
+		unusedTextList = new ArrayList<TextView>();
+		unusedTextList.add((TextView) findViewById(R.id.cashOmat2));		
+		unusedTextList = new ArrayList<TextView>();
+		unusedTextList.add((TextView) findViewById(R.id.cashOmat3));		
+		unusedTextList = new ArrayList<TextView>();
+		unusedTextList.add((TextView) findViewById(R.id.cashOmat4));		
+		unusedTextList = new ArrayList<TextView>();
+		unusedTextList.add((TextView) findViewById(R.id.cashOmat5));
 		
-		for(TextBean textBean : unusedTextList) {
-			textBean.text.setText("");
+		for(TextView textView : unusedTextList) {
+			textView.setText("");
 			
 		}
 		
@@ -351,9 +351,8 @@ public class CameraActivity extends Activity {
 			
 		}
 		else if(machine.getDisplayedView() != null){
-			machine.getDisplayedView().text.setText("");
-			machine.getDisplayedView().text.setBackgroundColor(Color.TRANSPARENT);
-			machine.getDisplayedView().img.setVisibility(View.GONE);
+			machine.getDisplayedView().setText("");
+			machine.getDisplayedView().setBackgroundColor(Color.TRANSPARENT);
 			unusedTextList.add(machine.getDisplayedView());
 			machine.setDisplayedView(null);
 		}
@@ -363,7 +362,7 @@ public class CameraActivity extends Activity {
 	public void displayText(BankOmat machine, double totDir) {
 		double widthPerDegree = xWith / camPreview.getCameraAngel();
 
-		TextBean bankOmat;
+		TextView bankOmat;
 		if(machine.getDisplayedView() != null) {
 			bankOmat = machine.getDisplayedView();
 		}
@@ -376,16 +375,17 @@ public class CameraActivity extends Activity {
 			machine.setDisplayedView(bankOmat);
 		}
 		
-		bankOmat.text.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m");
+		ImageSpan is = new ImageSpan(context, R.drawable.direction);
+		SpannableString text = new SpannableString("  " + machine.getBankName() 
+				+ "\n" + machine.getBankAddress()
+				+ "\n" + (int) machine.getDistance()+"m");
+		text.setSpan(is, 0, 1, SpannableString.SPAN_EXCLUSIVE_INCLUSIVE);
+		bankOmat.setText(text);
 		
-		MarginLayoutParams imgParam = (MarginLayoutParams) bankOmat.img.getLayoutParams();
-		imgParam.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
-		bankOmat.img.setLayoutParams(imgParam);
-		bankOmat.img.setVisibility(View.VISIBLE);
-		
-		MarginLayoutParams params = (MarginLayoutParams) bankOmat.text.getLayoutParams();
+		MarginLayoutParams params = (MarginLayoutParams) bankOmat.getLayoutParams();
 		params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2 + 20);
-		bankOmat.text.setLayoutParams(params);
+		bankOmat.setLayoutParams(params);
+		bankOmat.setBackgroundResource(R.drawable.bg_shape);
 	}
 
 
