@@ -55,7 +55,6 @@ public class CameraActivity extends Activity {
 	private CameraPreview camPreview;
 	private FrameLayout mainLayout;
 
-
 	private Location myLoc;
 	private Location lastPosLoaded;
 	private List<BankOmat> cashMachines = Collections.synchronizedList(new ArrayList<BankOmat>());
@@ -64,10 +63,10 @@ public class CameraActivity extends Activity {
 
 	private Timer timer = new Timer(100);
 
-	Messenger mService = null;
-	Messenger mSensorService = null;
-	final Messenger mGpsMessenger = new Messenger(new IncomingGpsHandler());
-	final Messenger mSensorMessenger = new Messenger(new IncomingSensorHandler());
+	private Messenger mService = null;
+	private Messenger mSensorService = null;
+	private final Messenger mGpsMessenger = new Messenger(new IncomingGpsHandler());
+	private final Messenger mSensorMessenger = new Messenger(new IncomingSensorHandler());
 	private double myDirection;
 	
 	private AutomatenLoader loader = new AutomatenLoader();
@@ -311,33 +310,16 @@ public class CameraActivity extends Activity {
 	 */
 	private void pointText(BankOmat machine) {
 		double totDir = machine.getDirection() - myDirection;
-		double widthPerDegree = xWith / camPreview.getCameraAngel();
+		
 
-		if (totDir < camPreview.getCameraAngel() / 2 && totDir > camPreview.getCameraAngel() / -2) {
-			TextBean bankOmat;
-			if(machine.getDisplayedView() != null) {
-				bankOmat = machine.getDisplayedView();
-			}
-			else if(unusedTextList.size() == 0) {
-				return;
-			}
-			else {
-				bankOmat = unusedTextList.get(0);
-				unusedTextList.remove(bankOmat);
-				machine.setDisplayedView(bankOmat);
-			}
+		if ((totDir < camPreview.getCameraAngel() / 2 && totDir > camPreview.getCameraAngel() / -2)) {
+			displayText(machine, totDir);
+		}
+		//Problemzone zwischen -180 und 180
+		else if((machine.getDirection() > (180-camPreview.getCameraAngel()/2) && myDirection < -180+camPreview.getCameraAngel()/2)
+					|| (machine.getDirection() < (-180+camPreview.getCameraAngel()/2) && myDirection > 180-camPreview.getCameraAngel()/2)) {
+			displayText(machine, totDir);
 			
-			bankOmat.text.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m");
-			
-			MarginLayoutParams imgParam = (MarginLayoutParams) bankOmat.img.getLayoutParams();
-			imgParam.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
-			bankOmat.img.setLayoutParams(imgParam);
-			bankOmat.img.setVisibility(View.VISIBLE);
-			
-			MarginLayoutParams params = (MarginLayoutParams) bankOmat.text.getLayoutParams();
-			params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2 + 20);
-			bankOmat.text.setLayoutParams(params);
-
 		}
 		else if(machine.getDisplayedView() != null){
 			machine.getDisplayedView().text.setText("");
@@ -348,6 +330,34 @@ public class CameraActivity extends Activity {
 		}
 		
 	}
+	
+	public void displayText(BankOmat machine, double totDir) {
+		double widthPerDegree = xWith / camPreview.getCameraAngel();
+
+		TextBean bankOmat;
+		if(machine.getDisplayedView() != null) {
+			bankOmat = machine.getDisplayedView();
+		}
+		else if(unusedTextList.size() == 0) {
+			return;
+		}
+		else {
+			bankOmat = unusedTextList.get(0);
+			unusedTextList.remove(bankOmat);
+			machine.setDisplayedView(bankOmat);
+		}
+		
+		bankOmat.text.setText(machine.getBankName() + "\n" + (int) machine.getDistance()+"m");
+		
+		MarginLayoutParams imgParam = (MarginLayoutParams) bankOmat.img.getLayoutParams();
+		imgParam.leftMargin = (int) (widthPerDegree * totDir + xWith / 2);
+		bankOmat.img.setLayoutParams(imgParam);
+		bankOmat.img.setVisibility(View.VISIBLE);
+		
+		MarginLayoutParams params = (MarginLayoutParams) bankOmat.text.getLayoutParams();
+		params.leftMargin = (int) (widthPerDegree * totDir + xWith / 2 + 20);
+		bankOmat.text.setLayoutParams(params);
+	}
 
 
 	
@@ -356,8 +366,6 @@ public class CameraActivity extends Activity {
 
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_main, menu);
-//	    MenuItem item = (MenuItem) findViewById(R.id.preferedMachine);
-//    	registerForContextMenu(menu);
 		return true;
 	}
 	
