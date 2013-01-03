@@ -64,18 +64,14 @@ public class AutomatenLoader implements Runnable {
 		String requestUrl = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?";
 		String location = latitude + "," + longitude;
 		String rankby = "distance";
-		String types = "atm";
+		String types = "atm|bank";
 		String sensor = "true";
-		String apiKey = "AIzaSyC5yZvpQSXq8e1x1LZTPXsSt6o0YohBNns"; // my
-																	// personal
-																	// API
-																	// Key... is
-																	// limited!!!
+		String apiKey = "AIzaSyC5yZvpQSXq8e1x1LZTPXsSt6o0YohBNns"; // my personal API Key... is limited!!!
 
 		requestUrl += "location=" + location + "&rankby=" + rankby + "&types="
 				+ types + "&sensor=" + sensor + "&key=" + apiKey;
 
-//		 JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
+		//JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
 		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
 
 		try {
