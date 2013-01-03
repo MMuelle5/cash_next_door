@@ -22,13 +22,14 @@ public final class R {
         public static final int cashOmat1=0x7f070007;
         public static final int cashOmat2=0x7f070008;
         public static final int cashOmat3=0x7f070009;
-        public static final int destroyMe=0x7f07000c;
+        public static final int destroyMe=0x7f07000d;
         public static final int frameLayout2=0x7f070003;
         public static final int imageView1=0x7f070004;
         public static final int imageView2=0x7f070005;
         public static final int imageView3=0x7f070006;
-        public static final int info=0x7f07000b;
+        public static final int info=0x7f07000c;
         public static final int myDirection=0x7f07000a;
+        public static final int preferedMachine=0x7f07000b;
         public static final int view_layout=0x7f070001;
     }
     public static final class layout {
@@ -40,6 +41,7 @@ public final class R {
         public static final int activity_main=0x7f060000;
     }
     public static final class string {
+        public static final int all=0x7f04000d;
         public static final int app_name=0x7f040000;
         public static final int beenden=0x7f040008;
         public static final int distance=0x7f040007;
@@ -50,6 +52,7 @@ public final class R {
         public static final int longitude=0x7f040005;
         public static final int machinesUpdated=0x7f04000b;
         public static final int menu_settings=0x7f040002;
+        public static final int prefered=0x7f04000c;
         public static final int title_activity_main=0x7f040003;
         public static final int woBinIch=0x7f040004;
     }

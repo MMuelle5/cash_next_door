@@ -2,7 +2,9 @@ package ch.imbApp.cash_next_door;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -21,6 +23,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -356,6 +360,8 @@ public class CameraActivity extends Activity {
 
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_main, menu);
+//	    MenuItem item = (MenuItem) findViewById(R.id.preferedMachine);
+//    	registerForContextMenu(menu);
 		return true;
 	}
 	
@@ -370,10 +376,64 @@ public class CameraActivity extends Activity {
 	        	String text = "INFO\n-----\nVersion: 1.0.0\n\nSeminararbeit <<Hand held>>\n\nWritten by:\n -Ramon Burri\n -Marius Mueller";
 	            Toast.makeText(CameraActivity.this, text, Toast.LENGTH_LONG).show();
 	        	return true;
+	        case R.id.preferedMachine:
+	        	getSubmenu(item);
+	            return true;
 	        default:
+	        	String title = (String) item.getTitle();
+	        	System.out.println(title);
+	        	if(title != null && title.equals(R.string.all)) {
+	        		loader.preferedMachine = null;
+	        		updateMachineList();
+	        	}
+	        	else if(title != null) {
+	        		loader.preferedMachine = title;
+	        		updateMachineList();
+	        	}
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
+
+	private void getSubmenu(MenuItem item) {
+
+		Map<String, String> types = new HashMap<String, String>();
+		
+		for(BankOmat machine : loader.completeMachineList) {
+			if(types.get(machine.getBankName()) == null) {
+				types.put(machine.getBankName(), "ok");
+			}
+		}
+
+		for(String name : types.keySet()) {
+	        item.getSubMenu().add(name); 
+		}
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+
+		Map<String, String> types = new HashMap<String, String>();
+		
+		for(BankOmat machine : loader.completeMachineList) {
+			if(types.get(machine.getBankName()) == null) {
+				types.put(machine.getBankName(), "ok");
+			}
+		}
+
+        menu.setHeaderTitle(R.string.prefered);  
+		for(String name : types.keySet()) {
+	        menu.add(0, v.getId(), 0, name); 
+		}
+	}
+	
+	@Override
+	 public boolean onContextItemSelected(MenuItem item) {  
+		loader.preferedMachine = String.valueOf(item.getTitle());
+		updateMachineList();
+		return true;
+	 }
+
 
 	private void stopAll() {
 		unbindService(mGpsConnection);

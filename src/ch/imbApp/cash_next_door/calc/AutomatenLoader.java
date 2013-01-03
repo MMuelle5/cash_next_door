@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,8 +21,10 @@ import ch.imbApp.cash_next_door.bean.BankOmat;
 public class AutomatenLoader implements Runnable {
 
 	public List<BankOmat> machineList = new ArrayList<BankOmat>();
+	public List<BankOmat> completeMachineList = new ArrayList<BankOmat>();
 	public double longitude;
 	public double latitude;
+	public String preferedMachine;
 
 	public static JSONObject makeHttpJsonRequest(String url) {
 		StringBuilder myContent = new StringBuilder();
@@ -108,13 +111,22 @@ public class AutomatenLoader implements Runnable {
 						machine.setLocation(loc);
 					}
 				}
-				machineList.add(machine);
+				completeMachineList.add(machine);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-		System.out.println(machineList.size());
+		if(preferedMachine != null) {
+			for(BankOmat mach : completeMachineList) {
+				machineList.add(mach);
+			}
+		}
+		
+		for(int i = 0; i < completeMachineList.size() && i < 6; i++) {
+			machineList.add(completeMachineList.get(i));
+		}
+		
 	}
 
 }
