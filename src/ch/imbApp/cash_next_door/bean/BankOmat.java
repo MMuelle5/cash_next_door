@@ -60,17 +60,17 @@ public class BankOmat {
 	}
 
 	public String getBankAddress() {
-		// remove city, only display street
-		String[] returnStr = bankAddress.split(",");
-		if (returnStr.length > 0) {
-			return returnStr[0];
-		}else {
-			return "";
-		}
+		return bankAddress;
 	}
 
 	public void setBankAddress(String bankAddress) {
-		this.bankAddress = bankAddress;
+		// remove city, only display street
+		String[] returnStr = bankAddress.split(",");
+		if (returnStr.length > 0) {
+			this.bankAddress = returnStr[0];
+		}else {
+			this.bankAddress = "";
+		}
 	}
 
 	public String getBankName() {
