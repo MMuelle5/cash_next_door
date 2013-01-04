@@ -1,6 +1,8 @@
 package ch.imbApp.cash_next_door.service;
 
-import ch.imbApp.cash_next_door.helper.Timer;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
@@ -15,6 +17,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+import ch.imbApp.cash_next_door.helper.Timer;
 
 public class SensorService extends Service implements SensorEventListener {
 	private static final String TAG = "SensorService";
@@ -41,6 +44,7 @@ public class SensorService extends Service implements SensorEventListener {
 	private double azimuth;
 	private double pitch;
 	private double lastAzimuthUpd;
+	private Queue<Double> directionChange = new LinkedList<Double>();
 	
 	static final float ALPHA = 0.8f;
 	
@@ -74,7 +78,10 @@ public class SensorService extends Service implements SensorEventListener {
 				SensorManager.SENSOR_DELAY_GAME);
 		sensorManager.registerListener(this, magnetometer,
 				SensorManager.SENSOR_DELAY_GAME);
-
+	
+		for(int i = 0; i < 10; i++) {
+			directionChange.add(0d);
+		}
 		System.out.println("Listeners registred!");
 		return START_STICKY;
 	}
@@ -113,8 +120,33 @@ public class SensorService extends Service implements SensorEventListener {
 					pitch = orientMatrix[0] * 180 / Math.PI;
 					roll = orientMatrix[0] * 180 / Math.PI;
 				}
+				
+				int grow = 0;
+				int sink = 0;
+				double lastDif = 0;
+				double avgDif = 0;
+				for(Double d : directionChange) {
+					if(d-1.5 > azimuth) {
+						sink++;
+					}
+					else if(d+1.5<azimuth){
+						grow ++;
+					}
+					lastDif = d - azimuth;
+					avgDif = d-azimuth;
+				}
+				directionChange.add(azimuth);
+				directionChange.remove();
 
-				sendMessageToUI();
+				avgDif = avgDif / 10;
+				if(sink > 8 || grow > 8) {
+					if(lastDif<5 && lastDif > -5) {
+
+						azimuth -= avgDif/2;
+						sendMessageToUI();
+						azimuth += avgDif/2;
+					}
+				}
 			}
 		}
 

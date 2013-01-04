@@ -72,8 +72,8 @@ public class AutomatenLoader implements Runnable {
 		requestUrl += "location=" + location + "&rankby=" + rankby + "&types="
 				+ types + "&sensor=" + sensor + "&key=" + apiKey;
 
-		JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
-//		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
+//		JSONObject jsonObject = makeHttpJsonRequest(requestUrl);
+		JSONObject jsonObject = makeHttpJsonRequest("http://der-esel.ch/stuff/hszt/handheld/json_response.json");
 
 		try {
 			JSONArray resultArray = (JSONArray) jsonObject.get("results");
